@@ -13,17 +13,17 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
-
         setContentView(binding.root)
         binding.cameraLaunchBtn.setOnClickListener{
             binding.cameraLaunchBtn.visibility=View.INVISIBLE
-            val transaction=supportFragmentManager.beginTransaction()
-            transaction.replace(R.id.camera_fragment_container,Camera_fragment())
-            transaction.commit()
-//            val i= Intent(this,CameraActivity::class.java)
-//            startActivity(i)
-//            finish()
+            openCameraFragment()
         }
 
+
+    }
+    private fun openCameraFragment(){
+        val transaction=supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.camera_fragment_container, Camera_fragment())
+        transaction.commit()
     }
 }

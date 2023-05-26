@@ -3,11 +3,14 @@ import android.Manifest
 import android.content.ContentValues
 import android.content.ContentValues.TAG
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.pdf.PdfDocument
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -25,8 +28,13 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.pdf_generator.MainActivity
 import com.example.pdf_generator.adapters.clickedImagePreviewAdapter
 import com.example.pdf_generator.databinding.FragmentCameraBinding
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -68,20 +76,11 @@ class Camera_fragment : Fragment()
         super.onViewCreated(view, savedInstanceState)
         bitmapList=ArrayList<Bitmap>()
         imgList= ArrayList()
-        if (checkallPermission())
-    {
-        startCamera()
-    }
-    else {
-        requestPermission()
-    }
+        if (checkallPermission()) startCamera()
+        else requestPermission()
+        binding.captureBtn.setOnClickListener{ captureImage() }
 
-        binding.captureBtn.setOnClickListener{
-
-        captureImage()
-
-        }
-
+        binding.saveBtn.setOnClickListener { createPdf(bitmapList, "sample ${randomNumberGeneratorForTest()}")}
 
 
 
@@ -109,16 +108,9 @@ class Camera_fragment : Fragment()
         : IntArray)
     {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_CODE)
-        {
-            if (checkallPermission())
-            {
-                startCamera()
-            }
-            else
-            {
-                Toast.makeText(requireContext(), "Permissions not granted by the user.", Toast.LENGTH_SHORT).show()
-            }
+        if (requestCode == REQUEST_CODE) {
+            if (checkallPermission()) { startCamera() }
+            else { Toast.makeText(requireContext(), "Permissions not granted by the user.", Toast.LENGTH_SHORT).show() }
         }
     }
 
@@ -127,64 +119,81 @@ class Camera_fragment : Fragment()
             registerForActivityResult(
                 ActivityResultContracts.RequestMultiplePermissions())
             { permissions ->
-                // Handle Permission granted/rejected
                 var permissionGranted = true
-                permissions.entries.forEach {
-                    if (it.key in REQUIRED_PERMISSIONS && it.value == false)
-                        permissionGranted = false
-                }
-                if (!permissionGranted) {
-                    Toast.makeText(requireContext(),
-                        "Permission denied",
-                        Toast.LENGTH_SHORT).show()
-                } else {
-                    startCamera()
-                }
+                    permissions.entries.forEach {
+                        if (it.key in REQUIRED_PERMISSIONS && it.value == false)
+                            permissionGranted = false
+                    }
+                if (!permissionGranted) Toast.makeText(requireContext(), "Permission denied",Toast.LENGTH_SHORT).show()
+                else startCamera()
             }
         activityResultLauncher.launch(REQUIRED_PERMISSIONS)
     }
 
     private
-    fun startCamera()
-    {
+    fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
-
-        cameraProviderFuture.addListener(
-            {
-
-                val cameraProvider : ProcessCameraProvider = cameraProviderFuture.get()
-
-
-                val preview = Preview.Builder()
+        cameraProviderFuture.addListener({
+            val cameraProvider : ProcessCameraProvider = cameraProviderFuture.get()
+            val preview = Preview.Builder()
                     .build()
-                    .also{
-                        it.setSurfaceProvider(binding.viewFinder.surfaceProvider)}
-
-                imgCapture = ImageCapture.Builder().build()
-
-
-                val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-
-                try
-                {
-                    // Unbind use cases before rebinding
+                    .also{ it.setSurfaceProvider(binding.viewFinder.surfaceProvider)}
+            imgCapture = ImageCapture.Builder().build()
+            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+            try{
                     cameraProvider.unbindAll()
-
-                    // Bind use cases to Camera_fragment
                     cameraProvider.bindToLifecycle(
                         this, cameraSelector, preview, imgCapture)
                 }
-                catch (exc
-                       : Exception)
-                {
+            catch (exc: Exception){
                     Log.e(TAG, "Use case binding failed", exc)
                 }
-            },
-            ContextCompat.getMainExecutor(requireContext()))
+            }, ContextCompat.getMainExecutor(requireContext()))
     }
-    private
-    fun captureImage()
-    {
+
+    fun randomNumberGeneratorForTest(): Int = kotlin.random.Random.nextInt()
+
+    private fun scaleBitmapToFitScreenWidth(bitmap: Bitmap, screenWidth: Int): Bitmap {
+        val bitmapWidth = bitmap.width
+        val bitmapHeight = bitmap.height
+
+        val scaledHeight = (screenWidth.toFloat() / bitmapWidth * bitmapHeight).toInt()
+
+        val processedBitmap = Bitmap.createScaledBitmap(bitmap, screenWidth, scaledHeight, true)
+        val stream = ByteArrayOutputStream()
+        processedBitmap.compress(Bitmap.CompressFormat.PNG, 50,stream)
+        return processedBitmap
+    }
+    fun createPdf(bitmaps: List<Bitmap>, pdfFileName: String) {
+        val pdfDocument = PdfDocument()
+        val displayMetrics = Resources.getSystem().displayMetrics
+        val screenWidth = displayMetrics.widthPixels
+
+        for (bitmap in bitmaps) {
+            val scaledBitmap = scaleBitmapToFitScreenWidth(bitmap, screenWidth)
+            val pageInfo = PdfDocument.PageInfo.Builder(scaledBitmap.width, scaledBitmap.height, pdfDocument.pages.size + 1).create()
+            val page = pdfDocument.startPage(pageInfo)
+            page.canvas.drawBitmap(scaledBitmap, 0f, 0f, null)
+            pdfDocument.finishPage(page)
+        }
+        val directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
+        if (!directory.exists()) {directory.mkdirs()}
+
+        val pdfFilePath = "${directory.path}/$pdfFileName.pdf"
+        val pdfFile = File(pdfFilePath)
+
+        try {
+            pdfDocument.writeTo(FileOutputStream(pdfFile))
+            pdfDocument.close()
+
+            Toast.makeText(requireContext(), "${pdfFileName}.pdf saved successfully", Toast.LENGTH_SHORT).show()
+        } catch (e: IOException) {
+            Log.w(TAG, "Error while creating Pdf: ${e}")
+            Toast.makeText(requireContext(), "Failed to create PDF", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun captureImage() {
         val imgCapture = imgCapture ?: return
         val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US).format(System.currentTimeMillis()).format(System.currentTimeMillis())
         val contentValues = ContentValues().apply {
@@ -194,21 +203,17 @@ class Camera_fragment : Fragment()
                 put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-Image")
             }
         }
-
         val outputOptions = ImageCapture.OutputFileOptions
             .Builder(requireContext().contentResolver,
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 contentValues)
             .build()
-
         imgCapture.takePicture(
             outputOptions,
             ContextCompat.getMainExecutor(requireContext()),
             object : ImageCapture.OnImageSavedCallback{
-                /** Called when an image has been successfully saved.  */
-        override fun onImageSaved(output : ImageCapture.OutputFileResults) {
+                override fun onImageSaved(output : ImageCapture.OutputFileResults) {
                     val msg = "Photo capture succeeded: ${output.savedUri}"
-//                    Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show()
                     Log.d(TAG, msg)
                     val savedUri = output.savedUri
                     savedUri?.let{
@@ -216,17 +221,16 @@ class Camera_fragment : Fragment()
                     }
                     setclickedImageinRV()
                     val capturedBitmap = savedUri?.let { getBitmapFromUri(it) }
-
-
                     capturedBitmap?.let { it->
                         bitmapList.add(it)
 
                     }
-        }
-
-            override fun onError(e: ImageCaptureException){
-                Log.e(TAG, "Photo capture failed: ${e.message}", e)
-            }})
+                }
+                override fun onError(e: ImageCaptureException){
+                    Log.e(TAG, "Photo capture failed: ${e.message}", e)
+                }
+            }
+        )
     }
 
     private fun getBitmapFromUri(it: Uri): Bitmap? {
@@ -242,8 +246,4 @@ class Camera_fragment : Fragment()
             null
         }
     }
-
-
-
-
 }
