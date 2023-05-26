@@ -23,6 +23,9 @@ import androidx.camera.core.Preview
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.pdf_generator.adapters.clickedImagePreviewAdapter
 import com.example.pdf_generator.databinding.FragmentCameraBinding
 import java.text.SimpleDateFormat
 import java.util.*
@@ -35,6 +38,7 @@ class Camera_fragment : Fragment()
     private val binding get()=_binding!!
 
     private lateinit var bitmapList:ArrayList<Bitmap>
+    private lateinit var imgList:ArrayList<Uri>
     private var imgCapture:ImageCapture?=null
     private val REQUEST_CODE = 20
 
@@ -63,6 +67,7 @@ class Camera_fragment : Fragment()
     {
         super.onViewCreated(view, savedInstanceState)
         bitmapList=ArrayList<Bitmap>()
+        imgList= ArrayList()
         if (checkallPermission())
     {
         startCamera()
@@ -70,12 +75,25 @@ class Camera_fragment : Fragment()
     else {
         requestPermission()
     }
+
         binding.captureBtn.setOnClickListener{
+
         captureImage()
+
         }
 
 
+
+
     }
+
+    private fun setclickedImageinRV() {
+        val adapter=clickedImagePreviewAdapter(imgList)
+        binding.clickedImgRecyclerView.layoutManager= LinearLayoutManager(requireContext(),
+            RecyclerView.HORIZONTAL,false)
+        binding.clickedImgRecyclerView.adapter=adapter
+    }
+
     private
     fun checkallPermission() = REQUIRED_PERMISSIONS.all{
         ContextCompat.checkSelfPermission(requireContext(), it) == PackageManager.PERMISSION_GRANTED
@@ -190,9 +208,13 @@ class Camera_fragment : Fragment()
                 /** Called when an image has been successfully saved.  */
         override fun onImageSaved(output : ImageCapture.OutputFileResults) {
                     val msg = "Photo capture succeeded: ${output.savedUri}"
-                    Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show()
+//                    Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show()
                     Log.d(TAG, msg)
                     val savedUri = output.savedUri
+                    savedUri?.let{
+                        imgList.add(it)
+                    }
+                    setclickedImageinRV()
                     val capturedBitmap = savedUri?.let { getBitmapFromUri(it) }
 
 
