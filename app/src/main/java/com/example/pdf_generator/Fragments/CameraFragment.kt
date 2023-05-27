@@ -120,7 +120,8 @@ class CameraFragment : Fragment()
                 ActivityResultContracts.RequestMultiplePermissions())
             { permissions ->
                 var permissionGranted = true
-                    permissions.entries.forEach {
+
+                permissions.entries.forEach {
                         if (it.key in REQUIRED_PERMISSIONS && it.value == false)
                             permissionGranted = false
                     }
@@ -200,7 +201,7 @@ class CameraFragment : Fragment()
     }
 
     private fun captureImage() {
-        val imgCapture = imgCapture ?: return
+        var imgCapture = imgCapture ?: return
         val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US).format(System.currentTimeMillis()).format(System.currentTimeMillis())
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
@@ -236,6 +237,9 @@ class CameraFragment : Fragment()
                 }
             }
         )
+        binding.flashIcon.setOnClickListener{
+
+        }
     }
 
     private fun getBitmapFromUri(it: Uri): Bitmap? {
