@@ -180,7 +180,7 @@ class CameraFragment : Fragment()
             page.canvas.drawBitmap(scaledBitmap, 0f, 0f, null)
             pdfDocument.finishPage(page)
         }
-        val directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
+        val directory = Environment.getExternalStoragePublicDirectory("PdfGeneratorDocuments")
         if (!directory.exists()) {directory.mkdirs()}
 
         val pdfFilePath = "${directory.path}/$pdfFileName.pdf"
