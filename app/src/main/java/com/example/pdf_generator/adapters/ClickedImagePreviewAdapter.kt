@@ -1,16 +1,14 @@
 package com.example.pdf_generator.adapters
 
-import android.graphics.Bitmap
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pdf_generator.R
 
-class clickedImagePreviewAdapter(private val imgList:ArrayList<Uri>):RecyclerView.Adapter<clickedImagePreviewAdapter.clickedImageViewHolder>() {
+class ClickedImagePreviewAdapter(private val imgList:ArrayList<Uri>):RecyclerView.Adapter<ClickedImagePreviewAdapter.clickedImageViewHolder>() {
     class clickedImageViewHolder(itemView: View):RecyclerView.ViewHolder(itemView) {
         val imageview= itemView.findViewById<ImageView>(R.id.clicked_iv)
     }

@@ -26,10 +26,10 @@ import androidx.camera.core.Preview
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.pdf_generator.MainActivity
-import com.example.pdf_generator.adapters.clickedImagePreviewAdapter
+import com.example.pdf_generator.adapters.ClickedImagePreviewAdapter
 import com.example.pdf_generator.databinding.FragmentCameraBinding
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -40,7 +40,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class Camera_fragment : Fragment()
+class CameraFragment : Fragment()
 {
     private var _binding:FragmentCameraBinding?=null
     private val binding get()=_binding!!
@@ -87,7 +87,7 @@ class Camera_fragment : Fragment()
     }
 
     private fun setclickedImageinRV() {
-        val adapter=clickedImagePreviewAdapter(imgList)
+        val adapter=ClickedImagePreviewAdapter(imgList)
         binding.clickedImgRecyclerView.layoutManager= LinearLayoutManager(requireContext(),
             RecyclerView.HORIZONTAL,false)
         binding.clickedImgRecyclerView.adapter=adapter
@@ -156,19 +156,23 @@ class Camera_fragment : Fragment()
     private fun scaleBitmapToFitScreenWidth(bitmap: Bitmap, screenWidth: Int): Bitmap {
         val bitmapWidth = bitmap.width
         val bitmapHeight = bitmap.height
-
         val scaledHeight = (screenWidth.toFloat() / bitmapWidth * bitmapHeight).toInt()
-
         val processedBitmap = Bitmap.createScaledBitmap(bitmap, screenWidth, scaledHeight, true)
         val stream = ByteArrayOutputStream()
-        processedBitmap.compress(Bitmap.CompressFormat.PNG, 50,stream)
-        return processedBitmap
+        processedBitmap.compress(Bitmap.CompressFormat.WEBP, 50 ,stream)
+        val  byteArray=stream.toByteArray()
+        return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
     }
+
     fun createPdf(bitmaps: List<Bitmap>, pdfFileName: String) {
+        if(bitmaps.size==0) {
+            Toast.makeText(requireContext(), "Click some images to proceed", Toast.LENGTH_SHORT).show()
+            return
+        }
         val pdfDocument = PdfDocument()
+
         val displayMetrics = Resources.getSystem().displayMetrics
         val screenWidth = displayMetrics.widthPixels
-
         for (bitmap in bitmaps) {
             val scaledBitmap = scaleBitmapToFitScreenWidth(bitmap, screenWidth)
             val pageInfo = PdfDocument.PageInfo.Builder(scaledBitmap.width, scaledBitmap.height, pdfDocument.pages.size + 1).create()
@@ -185,12 +189,14 @@ class Camera_fragment : Fragment()
         try {
             pdfDocument.writeTo(FileOutputStream(pdfFile))
             pdfDocument.close()
-
             Toast.makeText(requireContext(), "${pdfFileName}.pdf saved successfully", Toast.LENGTH_SHORT).show()
         } catch (e: IOException) {
             Log.w(TAG, "Error while creating Pdf: ${e}")
             Toast.makeText(requireContext(), "Failed to create PDF", Toast.LENGTH_SHORT).show()
         }
+
+        val action=CameraFragmentDirections.actionCameraFragmentToHomeFragment()
+        findNavController().navigate(action)
     }
 
     private fun captureImage() {
@@ -223,7 +229,6 @@ class Camera_fragment : Fragment()
                     val capturedBitmap = savedUri?.let { getBitmapFromUri(it) }
                     capturedBitmap?.let { it->
                         bitmapList.add(it)
-
                     }
                 }
                 override fun onError(e: ImageCaptureException){

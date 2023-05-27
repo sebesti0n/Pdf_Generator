@@ -1,29 +1,28 @@
 package com.example.pdf_generator
 
 
-import android.opengl.Visibility
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import com.example.pdf_generator.Fragments.Camera_fragment
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupActionBarWithNavController
+import com.example.pdf_generator.Fragments.CameraFragment
 import com.example.pdf_generator.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+    private lateinit var navController: NavController
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        binding.cameraLaunchBtn.setOnClickListener{
-            binding.cameraLaunchBtn.visibility=View.INVISIBLE
-            openCameraFragment()
-        }
 
+        val navHostFragment=supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        navController=navHostFragment.navController
+
+        setupActionBarWithNavController(navController)
 
     }
-    private fun openCameraFragment(){
-        val transaction=supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.camera_fragment_container, Camera_fragment())
-        transaction.commit()
-    }
+
 }
