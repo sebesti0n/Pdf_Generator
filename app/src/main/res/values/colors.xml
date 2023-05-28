@@ -10,4 +10,7 @@
     <color name="MainShade">#CBE9BF</color>
     <color name="AltShade">#EDF7E9</color>
     <color name="cameraShutterRegion">#555555</color>
+    <color name="bluePrimary">#7692FF</color>
+    <color name="blueSecondary">#ABD2FA</color>
+    <color name="blueDark">#3D518C</color>
 </resources>

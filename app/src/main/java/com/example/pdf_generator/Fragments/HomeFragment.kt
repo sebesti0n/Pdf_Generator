@@ -97,7 +97,7 @@ class HomeFragment : Fragment() {
             if (data != null) {
                 if(data.getClipData()!=null) {
                     val x = data.getClipData()!!.getItemCount()
-                    for (i in 0..x)
+                    for (i in 0 until x)
                         imageuriList.add(data.getClipData()!!.getItemAt(i).getUri())
 
                     for(i in imageuriList){
