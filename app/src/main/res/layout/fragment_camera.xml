@@ -7,16 +7,81 @@
     android:layout_height="match_parent"
     android:background="@color/black"
     tools:context=".MainActivity">
-        <ImageView
-            android:id="@+id/flash_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_marginTop="20dp"
-           android:layout_marginRight="20dp"
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/ll_above_options"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:layout_constraintBottom_toTopOf="@id/viewFinder"
+            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:background="@drawable/ic_flash_on"
-            />
+            android:orientation="horizontal"
+            >
+                <androidx.cardview.widget.CardView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:backgroundTint="@color/cameraShutterRegion"
+                    android:layout_weight="1">
+                        <ImageButton
+                            android:id="@+id/home_btn"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/ic_home"
+                            android:backgroundTint="@color/cameraShutterRegion"
+                            />
+
+                </androidx.cardview.widget.CardView>
+                <androidx.cardview.widget.CardView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:backgroundTint="@color/cameraShutterRegion"
+                    android:layout_weight="1">
+                        <ImageButton
+                            android:id="@+id/flash_auto_btn"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/ic_flash_auto"
+                            android:backgroundTint="@color/cameraShutterRegion"
+                            />
+
+                </androidx.cardview.widget.CardView>
+                <androidx.cardview.widget.CardView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:backgroundTint="@color/cameraShutterRegion"
+                    android:layout_weight="1">
+                        <ImageButton
+                            android:id="@+id/flash_on_btn"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/ic_flash_on"
+                            android:backgroundTint="@color/cameraShutterRegion"
+                            />
+
+                </androidx.cardview.widget.CardView>
+                <androidx.cardview.widget.CardView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:backgroundTint="@color/cameraShutterRegion"
+                    android:layout_weight="1">
+                        <ImageButton
+                            android:id="@+id/flash_off_btn"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/ic_flash_off"
+                            android:backgroundTint="@color/cameraShutterRegion"
+                            />
+
+                </androidx.cardview.widget.CardView>
+
+
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
         <androidx.camera.view.PreviewView
             android:id="@+id/viewFinder"
             app:layout_constrainedHeight="true"
@@ -24,7 +89,7 @@
             app:layout_constraintBottom_toTopOf="@id/ll_cameraShutter_Region"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ll_above_options"
             android:layout_height="match_parent" />
         <LinearLayout
             android:layout_width="match_parent"
@@ -37,41 +102,54 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/viewFinder">
-
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/clicked_img_recyclerView"
-            android:layout_width="wrap_content"
-            android:layout_height="60dp"
-            android:layout_margin="2dp"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toTopOf="@id/options_linear_layout"
-            app:layout_constraintHorizontal_bias="0.498"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="@id/viewFinder" />
-
-<!--        <LinearLayout-->
-<!--            android:id="@+id/options_linear_layout"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="150dp"-->
-<!--            android:gravity="center"-->
-<!--            android:orientation="horizontal"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--            app:layout_constraintHorizontal_bias="0.0"-->
-<!--            app:layout_constraintLeft_toLeftOf="parent"-->
-<!--            app:layout_constraintRight_toRightOf="parent"-->
-<!--            app:layout_constraintTop_toBottomOf="@id/viewFinder"-->
-<!--            app:layout_constraintVertical_bias="1.0">-->
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/options_linear_layout"
                     android:layout_width="match_parent"
                     android:layout_height="150dp">
 
-                <Button
+<!--                        <androidx.appcompat.widget.AppCompatImageView-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:src="@drawable/ic_camera_"-->
+<!--                            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--                            app:layout_constraintEnd_toStartOf="@+id/capture_btn"-->
+<!--                            app:layout_constraintStart_toStartOf="parent"-->
+<!--                            app:layout_constraintTop_toTopOf="parent" />-->
+                        <RelativeLayout
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="10dp"
+                            android:id="@+id/mainLayout"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/capture_btn"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                                <de.hdodenhof.circleimageview.CircleImageView
+                                android:id="@+id/Clicked_image"
+                                android:layout_width="65dp"
+                                android:layout_height="65dp"
+                                />
+
+<!--                                <ProgressBar-->
+<!--                                    android:id="@+id/clicked_image_progressBar"-->
+<!--                                    android:layout_width="65dp"-->
+<!--                                    android:layout_height="65dp"-->
+<!--                                    android:layout_alignStart="@+id/Clicked_image"-->
+<!--                                    android:layout_alignTop="@+id/Clicked_image"-->
+<!--                                    android:background="@drawable/circle_shape"-->
+<!--                                    android:max="100"-->
+<!--                                    android:padding="1dp"-->
+<!--                                    android:progress="65"-->
+<!--                                    android:progressDrawable="@drawable/circular_progress_bar"-->
+<!--                                    />-->
+                        </RelativeLayout>
+
+                        <android.widget.Button
                     android:id="@+id/capture_btn"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
+                    android:layout_width="65dp"
+                    android:layout_height="65dp"
                     android:layout_marginLeft="12dp"
                     android:background="@drawable/round_button"
                     android:layout_marginRight="12dp"
@@ -79,21 +157,27 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
+                    android:backgroundTintMode="add"
+                    android:backgroundTint="@color/white"
 
 
                         />
 
 
-                        <Button
+                        <android.widget.Button
                             android:id="@+id/save_btn"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Create Pdf"
+                            android:textColor="@color/black"
+                            android:visibility="gone"
                             android:background="@drawable/rounded_corner_button"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toEndOf="@+id/capture_btn"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            app:layout_constraintTop_toTopOf="parent"
+                            android:elevation="200dp"
+                            />
                 </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
 

@@ -2,30 +2,31 @@ package com.example.pdf_generator.Fragments
 import android.Manifest
 import android.content.ContentValues
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.pdf.PdfDocument
+import android.hardware.camera2.CameraManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.Preview
+import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
+import androidx.camera.core.ImageCapture.FLASH_MODE_AUTO
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -37,7 +38,6 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class CameraFragment : Fragment()
@@ -47,7 +47,9 @@ class CameraFragment : Fragment()
 
     private lateinit var bitmapList:ArrayList<Bitmap>
     private lateinit var imgList:ArrayList<Uri>
+    private var cameraManager:CameraManager?=null
     private var imgCapture:ImageCapture?=null
+    private lateinit var getcameraID:String
     private val REQUEST_CODE = 20
 
     companion object {
@@ -74,7 +76,8 @@ class CameraFragment : Fragment()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
-        bitmapList=ArrayList<Bitmap>()
+
+        bitmapList=ArrayList()
         imgList= ArrayList()
         if (checkallPermission()) startCamera()
         else requestPermission()
@@ -86,12 +89,12 @@ class CameraFragment : Fragment()
 
     }
 
-    private fun setclickedImageinRV() {
-        val adapter=ClickedImagePreviewAdapter(imgList)
-        binding.clickedImgRecyclerView.layoutManager= LinearLayoutManager(requireContext(),
-            RecyclerView.HORIZONTAL,false)
-        binding.clickedImgRecyclerView.adapter=adapter
-    }
+//    private fun setclickedImageinRV() {
+//        val adapter=ClickedImagePreviewAdapter(imgList)
+//        binding.clickedImgRecyclerView.layoutManager= LinearLayoutManager(requireContext(),
+//            RecyclerView.HORIZONTAL,false)
+//        binding.clickedImgRecyclerView.adapter=adapter
+//    }
 
     private
     fun checkallPermission() = REQUIRED_PERMISSIONS.all{
@@ -139,12 +142,24 @@ class CameraFragment : Fragment()
             val preview = Preview.Builder()
                     .build()
                     .also{ it.setSurfaceProvider(binding.viewFinder.surfaceProvider)}
+           binding.flashAutoBtn.setOnClickListener {
+               ImageCapture.Builder().setFlashMode(FLASH_MODE_AUTO)
+           }
+
             imgCapture = ImageCapture.Builder().build()
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
             try{
                     cameraProvider.unbindAll()
-                    cameraProvider.bindToLifecycle(
+                 val cam= cameraProvider.bindToLifecycle(
                         this, cameraSelector, preview, imgCapture)
+                        val camControl=cam.cameraControl
+                binding.flashOnBtn
+                    .setOnClickListener {
+                    camControl.enableTorch(true)
+                }
+                binding.flashOffBtn.setOnClickListener {
+                    camControl.enableTorch(false)
+                }
                 }
             catch (exc: Exception){
                     Log.e(TAG, "Use case binding failed", exc)
@@ -215,6 +230,7 @@ class CameraFragment : Fragment()
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 contentValues)
             .build()
+
         imgCapture.takePicture(
             outputOptions,
             ContextCompat.getMainExecutor(requireContext()),
@@ -223,10 +239,12 @@ class CameraFragment : Fragment()
                     val msg = "Photo capture succeeded: ${output.savedUri}"
                     Log.d(TAG, msg)
                     val savedUri = output.savedUri
+                    binding.ClickedImage.setImageURI(savedUri)
                     savedUri?.let{
                         imgList.add(it)
                     }
-                    setclickedImageinRV()
+                    if(imgList.size!=0)binding.saveBtn.visibility=View.VISIBLE
+
                     val capturedBitmap = savedUri?.let { getBitmapFromUri(it) }
                     capturedBitmap?.let { it->
                         bitmapList.add(it)
@@ -237,9 +255,8 @@ class CameraFragment : Fragment()
                 }
             }
         )
-        binding.flashIcon.setOnClickListener{
 
-        }
+
     }
 
     private fun getBitmapFromUri(it: Uri): Bitmap? {
@@ -254,5 +271,15 @@ class CameraFragment : Fragment()
             ).show()
             null
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (activity as AppCompatActivity?)!!.supportActionBar!!.hide()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        (activity as AppCompatActivity?)!!.supportActionBar!!.show()
     }
 }

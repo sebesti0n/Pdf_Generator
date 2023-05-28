@@ -75,5 +75,6 @@ dependencies {
     implementation "androidx.camera:camera-view:1.3.0-alpha07"
     implementation "androidx.camera:camera-core:1.3.0-alpha07"
 
-    
+    //circular Image
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
 }
