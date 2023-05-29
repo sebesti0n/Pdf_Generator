@@ -77,4 +77,7 @@ dependencies {
 
     //circular Image
     implementation 'de.hdodenhof:circleimageview:3.1.0'
+
+    //scanner
+    implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
 }

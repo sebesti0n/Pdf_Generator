@@ -62,6 +62,10 @@ class HomeFragment : Fragment() {
         //Permission checking...
        checkPermissions()
 
+        binding.llForScanner.setOnClickListener {
+            val action=HomeFragmentDirections.actionHomeFragmentToScannerFragment()
+            findNavController().navigate(action)
+        }
 
         binding.createPdfFab.setOnClickListener {
             val action=HomeFragmentDirections.actionHomeFragmentToCameraFragment()
