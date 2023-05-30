@@ -1,8 +1,10 @@
 package com.example.pdf_generator.Fragments
 
 import android.content.ContentValues
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -16,8 +18,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import androidx.navigation.fragment.findNavController
 import com.example.pdf_generator.R
 import com.example.pdf_generator.databinding.FragmentScannerBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.zxing.BinaryBitmap
 import com.google.zxing.LuminanceSource
 import com.google.zxing.MultiFormatReader
@@ -25,6 +29,7 @@ import com.google.zxing.PlanarYUVLuminanceSource
 import com.google.zxing.RGBLuminanceSource
 import com.google.zxing.common.HybridBinarizer
 import com.google.zxing.integration.android.IntentIntegrator.REQUEST_CODE
+import kotlinx.coroutines.NonCancellable.cancel
 import java.nio.ByteBuffer
 import java.util.concurrent.Executors
 
@@ -85,7 +90,6 @@ class ScannerFragment : Fragment() {
                 ActivityResultContracts.RequestMultiplePermissions())
             { permissions ->
                 var permissionGranted = true
-
                 permissions.entries.forEach {
                     if (it.key in CameraFragment.REQUIRED_PERMISSIONS && it.value == false)
                         permissionGranted = false
@@ -96,8 +100,7 @@ class ScannerFragment : Fragment() {
         activityResultLauncher.launch(CameraFragment.REQUIRED_PERMISSIONS)
     }
 
-    private
-    fun startCamera() {
+    private fun startCamera(){
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
         cameraProviderFuture.addListener({
             val cameraProvider : ProcessCameraProvider = cameraProviderFuture.get()
@@ -125,15 +128,67 @@ class ScannerFragment : Fragment() {
         }, ContextCompat.getMainExecutor(requireContext()))
     }
 
-    private fun processQRCodeResult(result: String?){
+    private var isDialogBoxShowing = false
+
+    private fun processQRCodeResult(result: String?) {
         result?.let {
-            Handler(Looper.getMainLooper()).post{
-                binding.resultTv.text = it
-                Toast.makeText(requireContext(), "result: $it", Toast.LENGTH_SHORT).show()
+            if (!isDialogBoxShowing) {
+                isDialogBoxShowing = true
+                val handler = Handler(Looper.getMainLooper())
+                val runnable = Runnable {
+                    buildDialogBox(it)
+                }
+                handler.post(runnable)
             }
         }
     }
 
+    private fun buildDialogBox(res: String){
+        Log.w("check", "creating dialogBox")
+        val builder=MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Link Found")
+            .setMessage(res)
+            .setNeutralButton("Close") { _, which ->
+//                navigateToHome()
+                Log.w("check", "close: $which")
+            }
+            .setNegativeButton("Scan other Code") { _, which ->
+                Log.w("check", " scan other: $which")
+            }
+            .setPositiveButton("Open Link") { _, which ->
+//                openInWeb(res)
+                Log.w("check", "open: $which")
+            }
+        val dialog=builder.show()
+        dialog.getButton(-1).setOnClickListener {
+
+            dialog.dismiss()
+            isDialogBoxShowing=false
+            openInWeb(res)
+        }
+        dialog.getButton(-2).setOnClickListener {
+
+            dialog.dismiss()
+            isDialogBoxShowing=false
+        }
+        dialog.getButton(-3).setOnClickListener {
+            dialog.dismiss()
+            isDialogBoxShowing=false
+            navigateToHome()
+        }
+
+
+
+    }
+    private fun openInWeb(res: String){
+        val query: Uri = Uri.parse(res)
+        val intent=Intent(Intent.ACTION_VIEW, query)
+        startActivity(intent)
+    }
+    private fun navigateToHome(){
+        val action=ScannerFragmentDirections.actionScannerFragmentToHomeFragment()
+        findNavController().navigate(action)
+    }
     @androidx.annotation.OptIn(androidx.camera.core.ExperimentalGetImage::class)
     private fun decodeQRCode(imageProxy: ImageProxy): String? {
         try {
