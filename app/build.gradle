@@ -27,6 +27,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
         sourceCompatibility '1.8'
         targetCompatibility '1.8'
@@ -37,6 +38,7 @@ android {
     buildFeatures {
         viewBinding true
     }
+
 }
 
 dependencies {
@@ -75,9 +77,10 @@ dependencies {
     implementation "androidx.camera:camera-view:1.3.0-alpha07"
     implementation "androidx.camera:camera-core:1.3.0-alpha07"
 
-    //circular Image
-    implementation 'de.hdodenhof:circleimageview:3.1.0'
 
-    //scanner
+     //scanner
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
+
+    //pdfMaker
+    implementation 'com.itextpdf:itextg:5.5.10'
 }

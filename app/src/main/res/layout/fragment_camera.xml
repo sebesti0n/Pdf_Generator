@@ -125,11 +125,24 @@
                             app:layout_constraintEnd_toStartOf="@+id/capture_btn"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent">
-
-                                <de.hdodenhof.circleimageview.CircleImageView
+                            <androidx.cardview.widget.CardView
                                 android:id="@+id/Clicked_image"
                                 android:layout_width="65dp"
-                                android:layout_height="65dp" />
+                                android:layout_height="65dp"
+                                app:cardCornerRadius="100dp"
+                                android:visibility="gone"
+                                >
+
+                             <ImageView
+                                 android:id="@+id/Clicked_image_iv"
+                                 android:layout_width="match_parent"
+                                 android:layout_height="match_parent"
+
+                                 android:scaleType="centerCrop"
+                                 android:adjustViewBounds="true"
+                                 />
+                            </androidx.cardview.widget.CardView>
+
 
 <!--                                <ProgressBar-->
 <!--                                    android:id="@+id/clicked_image_progressBar"-->

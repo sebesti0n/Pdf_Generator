@@ -2,7 +2,6 @@ package com.example.pdf_generator.Fragments
 import android.Manifest
 import android.content.ContentValues
 import android.content.ContentValues.TAG
-import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.Bitmap
@@ -25,12 +24,8 @@ import androidx.camera.core.*
 import androidx.camera.core.ImageCapture.FLASH_MODE_AUTO
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.example.pdf_generator.adapters.ClickedImagePreviewAdapter
 import com.example.pdf_generator.databinding.FragmentCameraBinding
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -46,7 +41,7 @@ class CameraFragment : Fragment()
     private val binding get()=_binding!!
 
     private lateinit var bitmapList:ArrayList<Bitmap>
-    private lateinit var imgList:ArrayList<Uri>
+    private var imgList:ArrayList<Uri>?=null
     private var cameraManager:CameraManager?=null
     private var imgCapture:ImageCapture?=null
     private lateinit var getcameraID:String
@@ -84,7 +79,25 @@ class CameraFragment : Fragment()
         binding.captureBtn.setOnClickListener{ captureImage() }
 
         binding.saveBtn.setOnClickListener { createPdf(bitmapList, "sample ${randomNumberGeneratorForTest()}")}
-
+        binding.homeBtn.setOnClickListener {
+            val action=CameraFragmentDirections.actionCameraFragmentToHomeFragment()
+            findNavController().navigate(action)
+        }
+        binding.saveBtn.setOnClickListener {
+            if (imgList!!.isEmpty()) {
+                Toast.makeText(requireContext(), "click some images", Toast.LENGTH_SHORT).show()
+            } else {
+//                val bundle = Bundle()
+//                bundle.putParcelableArrayList("uri", imgList)
+//
+//                val receiverFragment = ImagePreviewFragment()
+//                receiverFragment.apply { arguments=bundle }
+                val imguri:Array<Uri> = imgList!!.toTypedArray()
+                Toast.makeText(requireContext(), "${imguri.size}", Toast.LENGTH_SHORT).show()
+                val action = CameraFragmentDirections.actionCameraFragmentToImagePreviewFragment(imguri)
+                findNavController().navigate(action)
+            }
+        }
 
 
     }
@@ -211,8 +224,7 @@ class CameraFragment : Fragment()
             Toast.makeText(requireContext(), "Failed to create PDF", Toast.LENGTH_SHORT).show()
         }
 
-        val action=CameraFragmentDirections.actionCameraFragmentToHomeFragment()
-        findNavController().navigate(action)
+
     }
 
     private fun captureImage() {
@@ -239,11 +251,12 @@ class CameraFragment : Fragment()
                     val msg = "Photo capture succeeded: ${output.savedUri}"
                     Log.d(TAG, msg)
                     val savedUri = output.savedUri
-                    binding.ClickedImage.setImageURI(savedUri)
+                    binding.ClickedImageIv.setImageURI(savedUri)
+                    binding.ClickedImage.visibility=View.VISIBLE
                     savedUri?.let{
-                        imgList.add(it)
+                        imgList?.add(it)
                     }
-                    if(imgList.size!=0)binding.saveBtn.visibility=View.VISIBLE
+                    if(imgList?.size!=0)binding.saveBtn.visibility=View.VISIBLE
 
                     val capturedBitmap = savedUri?.let { getBitmapFromUri(it) }
                     capturedBitmap?.let { it->

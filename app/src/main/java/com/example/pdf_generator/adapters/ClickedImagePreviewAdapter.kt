@@ -4,14 +4,43 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ImageView
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.example.pdf_generator.Listner.ItemClickListner
 import com.example.pdf_generator.R
 
-class ClickedImagePreviewAdapter(private val imgList:ArrayList<Uri>):RecyclerView.Adapter<ClickedImagePreviewAdapter.clickedImageViewHolder>() {
-    class clickedImageViewHolder(itemView: View):RecyclerView.ViewHolder(itemView) {
-        val imageview= itemView.findViewById<ImageView>(R.id.clicked_iv)
+class ClickedImagePreviewAdapter( private val imgList:ArrayList<Uri>?):RecyclerView.Adapter<ClickedImagePreviewAdapter.clickedImageViewHolder>() {
+
+
+
+private var listData:MutableList<Uri> = imgList as MutableList<Uri>
+
+    fun getList():MutableList<Uri>{
+        return listData
     }
+    inner class clickedImageViewHolder(itemView: View) :RecyclerView.ViewHolder(itemView) {
+
+        fun bind(uri:Uri,idx:Int){
+
+            val imageview= itemView.findViewById<ImageView>(R.id.clicked_iv)
+            val btndelete=itemView.findViewById<ImageButton>(R.id.item_delete_btn)
+
+            imageview.setImageURI(uri)
+            btndelete.setOnClickListener {
+                deleteitem(idx)
+            }
+        }
+
+    }
+    fun deleteitem(idx:Int){
+        listData.removeAt(idx)
+        notifyDataSetChanged()
+    }
+
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): clickedImageViewHolder {
@@ -21,12 +50,13 @@ class ClickedImagePreviewAdapter(private val imgList:ArrayList<Uri>):RecyclerVie
 
 
     override fun getItemCount(): Int {
-        return imgList.size
+        return listData.size
     }
 
 
     override fun onBindViewHolder(holder: clickedImageViewHolder, position: Int) {
-        holder.imageview.setImageURI(imgList[position])
+        holder.bind(listData[position],position)
     }
+
 
 }

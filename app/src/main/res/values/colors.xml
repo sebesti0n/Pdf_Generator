@@ -8,9 +8,10 @@
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
     <color name="MainShade">#CBE9BF</color>
-    <color name="AltShade">#EDF7E9</color>
+    <color name="AltShade">#7692FF</color>
     <color name="cameraShutterRegion">#122033</color>
     <color name="bluePrimary">#7692FF</color>
     <color name="blueSecondary">#ABD2FA</color>
     <color name="blueDark">#3D518C</color>
+    <color name="lightblue">#A4EFF6FF</color>
 </resources>
