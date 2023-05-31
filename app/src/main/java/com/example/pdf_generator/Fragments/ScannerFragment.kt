@@ -126,11 +126,13 @@ class ScannerFragment : Fragment() {
 
             cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalyzer)
         }, ContextCompat.getMainExecutor(requireContext()))
+        binding.midButton.visibility=View.VISIBLE
     }
 
     private var isDialogBoxShowing = false
 
     private fun processQRCodeResult(result: String?) {
+        binding.midButton.visibility=View.VISIBLE
         result?.let {
             if (!isDialogBoxShowing) {
                 isDialogBoxShowing = true
@@ -144,6 +146,7 @@ class ScannerFragment : Fragment() {
     }
 
     private fun buildDialogBox(res: String){
+        binding.midButton.visibility=View.VISIBLE
         Log.w("check", "creating dialogBox")
         val builder=MaterialAlertDialogBuilder(requireContext())
             .setTitle("Link Found")

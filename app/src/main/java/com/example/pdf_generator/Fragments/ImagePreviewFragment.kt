@@ -2,8 +2,6 @@ package com.example.pdf_generator.Fragments
 
 import android.Manifest
 import android.content.ContentValues
-import android.content.Context
-import android.content.ContextWrapper
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -18,23 +16,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
-import androidx.camera.core.impl.utils.ContextUtil.getApplicationContext
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.pdf_generator.Activities.MainActivity
-import com.example.pdf_generator.Listner.ItemClickListner
+import com.example.pdf_generator.Listener.ItemClickListner
+
 import com.example.pdf_generator.R
 import com.example.pdf_generator.UI.AppViewModel
 import com.example.pdf_generator.adapters.ClickedImagePreviewAdapter
 import com.example.pdf_generator.databinding.FragmentImagePreviewBinding
-import com.itextpdf.text.Document
-import com.itextpdf.text.Image
-import com.itextpdf.text.PageSize
-import com.itextpdf.text.pdf.PdfWriter
+import com.pspdfkit.configuration.activity.PdfActivityConfiguration
+import com.pspdfkit.ui.PdfActivity
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -105,8 +99,7 @@ class ImagePreviewFragment : Fragment(), ItemClickListner {
 
                 } else {
                     createPdf(viewModel.listOfBitmaps.value!!, temp)
-                    val action=ImagePreviewFragmentDirections.actionImagePreviewFragmentToHomeFragment()
-                    findNavController().navigate(action)
+                    openDoc( temp)
                 }
             }
             setNegativeButton("Cancel") { dialog, which ->
@@ -119,6 +112,20 @@ class ImagePreviewFragment : Fragment(), ItemClickListner {
         }
 
     }
+
+    private fun openDoc(pdfFileName: String) {
+        val documentsDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
+        val directoryName = "pdfGeneratorDocuments"
+        val directory=File(documentsDirectory, directoryName)
+        if (!directory.exists()) {directory.mkdirs()}
+
+        val pdfFilePath = "${directory.path}/$pdfFileName.pdf"
+        val pdfFile = File(pdfFilePath)
+        val uri = Uri.fromFile( pdfFile)
+        val config = context?.let { PdfActivityConfiguration.Builder(it).build() }
+        PdfActivity.showDocument(requireContext(), uri, config)
+    }
+
     private fun scaleBitmapToFitScreenWidth(bitmap: Bitmap, screenWidth: Int): Bitmap {
         val bitmapWidth = bitmap.width
         val bitmapHeight = bitmap.height
@@ -172,7 +179,12 @@ class ImagePreviewFragment : Fragment(), ItemClickListner {
 
     override fun onDeleteBtnClick(view: View, position: Int) {
         viewModel.deleteElementAtPos(position)
+       adapter.notifyItemRemoved(position)
         updateRecyclerView()
+    }
+
+    override fun openPDF() {
+        TODO("Not yet implemented")
     }
 
 }

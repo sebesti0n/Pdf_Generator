@@ -1,24 +1,22 @@
 package com.example.pdf_generator.adapters
 
 import android.graphics.Bitmap
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ImageButton
 import android.widget.ImageView
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.example.pdf_generator.Listner.ItemClickListner
+import com.example.pdf_generator.Listener.ItemClickListner
 import com.example.pdf_generator.R
 
 class ClickedImagePreviewAdapter(val itemClickListner: ItemClickListner):RecyclerView.Adapter<ClickedImagePreviewAdapter.ClickedImageViewHolder>() {
 
     class ClickedImageViewHolder(view: View): RecyclerView.ViewHolder(view){
         val image: ImageView=view.findViewById(R.id.image)
-        val deleteBtn: ImageView=view.findViewById(R.id.delete_image_button)
+        val deleteBtn: ImageView =view.findViewById(R.id.delete_image_button)
     }
     private val differCallback=object: DiffUtil.ItemCallback<Bitmap>(){
         override fun areContentsTheSame(oldItem: Bitmap, newItem: Bitmap): Boolean {
@@ -46,6 +44,7 @@ class ClickedImagePreviewAdapter(val itemClickListner: ItemClickListner):Recycle
         val item=differ.currentList[position]
         holder.image.setImageBitmap(item)
         holder.deleteBtn.setOnClickListener { itemClickListner.onDeleteBtnClick(it, position)}
+
     }
 
     override fun getItemCount(): Int {

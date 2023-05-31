@@ -163,7 +163,7 @@ class CameraFragment : Fragment()
             }, ContextCompat.getMainExecutor(requireContext()))
     }
 
-    fun randomNumberGeneratorForTest(): Int = kotlin.random.Random.nextInt()
+
 
 
 
@@ -188,8 +188,7 @@ class CameraFragment : Fragment()
             ContextCompat.getMainExecutor(requireContext()),
             object : ImageCapture.OnImageSavedCallback{
                 override fun onImageSaved(output : ImageCapture.OutputFileResults) {
-                    val msg = "Photo capture succeeded: ${output.savedUri}"
-                    Log.d(TAG, msg)
+
                     val savedUri = output.savedUri
 
                     val capturedBitmap = savedUri?.let { getBitmapFromUri(it) }
