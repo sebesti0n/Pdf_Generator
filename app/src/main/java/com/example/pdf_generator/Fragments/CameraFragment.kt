@@ -26,6 +26,8 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.example.pdf_generator.Activities.MainActivity
+import com.example.pdf_generator.UI.AppViewModel
 import com.example.pdf_generator.databinding.FragmentCameraBinding
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -39,9 +41,7 @@ class CameraFragment : Fragment()
 {
     private var _binding:FragmentCameraBinding?=null
     private val binding get()=_binding!!
-
-    private lateinit var bitmapList:ArrayList<Bitmap>
-    private var imgList:ArrayList<Uri>?=null
+    private lateinit var viewModel: AppViewModel
     private var cameraManager:CameraManager?=null
     private var imgCapture:ImageCapture?=null
     private lateinit var getcameraID:String
@@ -64,6 +64,7 @@ class CameraFragment : Fragment()
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        viewModel=(activity as MainActivity).viewModel
         _binding= FragmentCameraBinding.inflate(inflater,container,false)
         return binding.root
     }
@@ -71,43 +72,25 @@ class CameraFragment : Fragment()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
-
-        bitmapList=ArrayList()
-        imgList= ArrayList()
         if (checkallPermission()) startCamera()
         else requestPermission()
         binding.captureBtn.setOnClickListener{ captureImage() }
 
-        binding.saveBtn.setOnClickListener { createPdf(bitmapList, "sample ${randomNumberGeneratorForTest()}")}
         binding.homeBtn.setOnClickListener {
             val action=CameraFragmentDirections.actionCameraFragmentToHomeFragment()
             findNavController().navigate(action)
         }
         binding.saveBtn.setOnClickListener {
-            if (imgList!!.isEmpty()) {
-                Toast.makeText(requireContext(), "click some images", Toast.LENGTH_SHORT).show()
-            } else {
-//                val bundle = Bundle()
-//                bundle.putParcelableArrayList("uri", imgList)
-//
-//                val receiverFragment = ImagePreviewFragment()
-//                receiverFragment.apply { arguments=bundle }
-                val imguri:Array<Uri> = imgList!!.toTypedArray()
-                Toast.makeText(requireContext(), "${imguri.size}", Toast.LENGTH_SHORT).show()
-                val action = CameraFragmentDirections.actionCameraFragmentToImagePreviewFragment(imguri)
+            if(viewModel.getListSize()==0) Toast.makeText(requireContext(), "Cannot create empty Pdf", Toast.LENGTH_SHORT).show()
+            else {
+                val action=CameraFragmentDirections.actionCameraFragmentToImagePreviewFragment()
                 findNavController().navigate(action)
             }
+
         }
 
 
     }
-
-//    private fun setclickedImageinRV() {
-//        val adapter=ClickedImagePreviewAdapter(imgList)
-//        binding.clickedImgRecyclerView.layoutManager= LinearLayoutManager(requireContext(),
-//            RecyclerView.HORIZONTAL,false)
-//        binding.clickedImgRecyclerView.adapter=adapter
-//    }
 
     private
     fun checkallPermission() = REQUIRED_PERMISSIONS.all{
@@ -182,50 +165,7 @@ class CameraFragment : Fragment()
 
     fun randomNumberGeneratorForTest(): Int = kotlin.random.Random.nextInt()
 
-    private fun scaleBitmapToFitScreenWidth(bitmap: Bitmap, screenWidth: Int): Bitmap {
-        val bitmapWidth = bitmap.width
-        val bitmapHeight = bitmap.height
-        val scaledHeight = (screenWidth.toFloat() / bitmapWidth * bitmapHeight).toInt()
-        val processedBitmap = Bitmap.createScaledBitmap(bitmap, screenWidth, scaledHeight, true)
-        val stream = ByteArrayOutputStream()
-        processedBitmap.compress(Bitmap.CompressFormat.WEBP, 50 ,stream)
-        val  byteArray=stream.toByteArray()
-        return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
-    }
 
-    fun createPdf(bitmaps: List<Bitmap>, pdfFileName: String) {
-        if(bitmaps.size==0) {
-            Toast.makeText(requireContext(), "Click some images to proceed", Toast.LENGTH_SHORT).show()
-            return
-        }
-        val pdfDocument = PdfDocument()
-
-        val displayMetrics = Resources.getSystem().displayMetrics
-        val screenWidth = displayMetrics.widthPixels
-        for (bitmap in bitmaps) {
-            val scaledBitmap = scaleBitmapToFitScreenWidth(bitmap, screenWidth)
-            val pageInfo = PdfDocument.PageInfo.Builder(scaledBitmap.width, scaledBitmap.height, pdfDocument.pages.size + 1).create()
-            val page = pdfDocument.startPage(pageInfo)
-            page.canvas.drawBitmap(scaledBitmap, 0f, 0f, null)
-            pdfDocument.finishPage(page)
-        }
-        val directory = Environment.getExternalStoragePublicDirectory("PdfGeneratorDocuments")
-        if (!directory.exists()) {directory.mkdirs()}
-
-        val pdfFilePath = "${directory.path}/$pdfFileName.pdf"
-        val pdfFile = File(pdfFilePath)
-
-        try {
-            pdfDocument.writeTo(FileOutputStream(pdfFile))
-            pdfDocument.close()
-            Toast.makeText(requireContext(), "${pdfFileName}.pdf saved successfully", Toast.LENGTH_SHORT).show()
-        } catch (e: IOException) {
-            Log.w(TAG, "Error while creating Pdf: ${e}")
-            Toast.makeText(requireContext(), "Failed to create PDF", Toast.LENGTH_SHORT).show()
-        }
-
-
-    }
 
     private fun captureImage() {
         var imgCapture = imgCapture ?: return
@@ -251,16 +191,13 @@ class CameraFragment : Fragment()
                     val msg = "Photo capture succeeded: ${output.savedUri}"
                     Log.d(TAG, msg)
                     val savedUri = output.savedUri
-                    binding.ClickedImageIv.setImageURI(savedUri)
-                    binding.ClickedImage.visibility=View.VISIBLE
-                    savedUri?.let{
-                        imgList?.add(it)
-                    }
-                    if(imgList?.size!=0)binding.saveBtn.visibility=View.VISIBLE
 
                     val capturedBitmap = savedUri?.let { getBitmapFromUri(it) }
                     capturedBitmap?.let { it->
-                        bitmapList.add(it)
+                        binding.ClickedImageIv.setImageBitmap(it)
+                        binding.ClickedImage.visibility=View.VISIBLE
+                        binding.saveBtn.visibility=View.VISIBLE
+                        viewModel.addElementToList(it)
                     }
                 }
                 override fun onError(e: ImageCaptureException){
@@ -284,15 +221,5 @@ class CameraFragment : Fragment()
             ).show()
             null
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        (activity as AppCompatActivity?)!!.supportActionBar!!.hide()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        (activity as AppCompatActivity?)!!.supportActionBar!!.show()
     }
 }

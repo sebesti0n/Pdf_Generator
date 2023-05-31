@@ -34,9 +34,6 @@
         android:name="com.example.pdf_generator.Fragments.ImagePreviewFragment"
         android:label="fragment_image_preview"
         tools:layout="@layout/fragment_image_preview" >
-        <argument
-            android:name="uriImage"
-            app:argType="android.net.Uri[]" />
         <action
             android:id="@+id/action_imagePreviewFragment_to_homeFragment"
             app:destination="@id/homeFragment" />

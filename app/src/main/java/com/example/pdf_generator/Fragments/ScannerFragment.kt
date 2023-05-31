@@ -149,15 +149,10 @@ class ScannerFragment : Fragment() {
             .setTitle("Link Found")
             .setMessage(res)
             .setNeutralButton("Close") { _, which ->
-//                navigateToHome()
-                Log.w("check", "close: $which")
             }
             .setNegativeButton("Scan other Code") { _, which ->
-                Log.w("check", " scan other: $which")
             }
             .setPositiveButton("Open Link") { _, which ->
-//                openInWeb(res)
-                Log.w("check", "open: $which")
             }
         val dialog=builder.show()
         dialog.getButton(-1).setOnClickListener {

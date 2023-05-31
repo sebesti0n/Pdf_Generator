@@ -1,5 +1,6 @@
 package com.example.pdf_generator.adapters
 
+import android.graphics.Bitmap
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
@@ -13,50 +14,42 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.pdf_generator.Listner.ItemClickListner
 import com.example.pdf_generator.R
 
-class ClickedImagePreviewAdapter( private val imgList:ArrayList<Uri>?):RecyclerView.Adapter<ClickedImagePreviewAdapter.clickedImageViewHolder>() {
+class ClickedImagePreviewAdapter(val itemClickListner: ItemClickListner):RecyclerView.Adapter<ClickedImagePreviewAdapter.ClickedImageViewHolder>() {
 
-
-
-private var listData:MutableList<Uri> = imgList as MutableList<Uri>
-
-    fun getList():MutableList<Uri>{
-        return listData
+    class ClickedImageViewHolder(view: View): RecyclerView.ViewHolder(view){
+        val image: ImageView=view.findViewById(R.id.image)
+        val deleteBtn: ImageView=view.findViewById(R.id.delete_image_button)
     }
-    inner class clickedImageViewHolder(itemView: View) :RecyclerView.ViewHolder(itemView) {
-
-        fun bind(uri:Uri,idx:Int){
-
-            val imageview= itemView.findViewById<ImageView>(R.id.clicked_iv)
-            val btndelete=itemView.findViewById<ImageButton>(R.id.item_delete_btn)
-
-            imageview.setImageURI(uri)
-            btndelete.setOnClickListener {
-                deleteitem(idx)
-            }
+    private val differCallback=object: DiffUtil.ItemCallback<Bitmap>(){
+        override fun areContentsTheSame(oldItem: Bitmap, newItem: Bitmap): Boolean {
+            return oldItem.sameAs(newItem)
         }
 
-    }
-    fun deleteitem(idx:Int){
-        listData.removeAt(idx)
-        notifyDataSetChanged()
-    }
-
-
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): clickedImageViewHolder {
-        val view= LayoutInflater.from(parent.context).inflate(R.layout.clicked_image_item_list,parent,false)
-        return clickedImageViewHolder(view)
+        override fun areItemsTheSame(oldItem: Bitmap, newItem: Bitmap): Boolean {
+            return oldItem.sameAs(newItem)
+        }
     }
 
+    val differ= AsyncListDiffer(this, differCallback)
+
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): ClickedImageViewHolder {
+        return ClickedImageViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.clicked_image_item_list, parent, false))
+    }
+
+    override fun onBindViewHolder(
+        holder: ClickedImageViewHolder,
+        position: Int
+    ) {
+
+        val item=differ.currentList[position]
+        holder.image.setImageBitmap(item)
+        holder.deleteBtn.setOnClickListener { itemClickListner.onDeleteBtnClick(it, position)}
+    }
 
     override fun getItemCount(): Int {
-        return listData.size
+        return differ.currentList.size
     }
-
-
-    override fun onBindViewHolder(holder: clickedImageViewHolder, position: Int) {
-        holder.bind(listData[position],position)
-    }
-
-
 }

@@ -1,35 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-
-    android:layout_width="125dp"
-    android:layout_height="125dp"
-    android:layout_margin="5dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:background="@color/lightblue"
-    android:elevation="20dp"
+    android:layout_margin="2dp"
     app:cardElevation="50dp">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="120dp"
+        android:layout_height="150dp">
         <ImageView
-            android:id="@+id/clicked_iv"
+            android:id="@+id/image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="2dp" />
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:src="@color/black"
+            />
 
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:layout_alignParentStart="true"
-            android:id="@+id/item_delete_btn"
-            android:layout_alignParentTop="true"
-            android:padding="30dp"
-            android:background="@color/black"
-            android:layout_marginStart="98dp"
-            android:layout_marginTop="99dp"
-            android:src="@drawable/ic_delete" />
-    </RelativeLayout>
+        <com.google.android.material.imageview.ShapeableImageView
+            android:layout_width="40dp"
+            android:clickable="true"
+            android:layout_height="40dp"
+            android:id="@+id/delete_image_button"
+            android:src="@drawable/ic_delete"
+            android:layout_margin="2dp"
+            app:layout_constraintBottom_toBottomOf="@id/image"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintLeft_toLeftOf="@id/image"
+            app:layout_constraintRight_toRightOf="@id/image"
+            app:layout_constraintTop_toTopOf="@id/image"
+            app:layout_constraintVertical_bias="1.0" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>
