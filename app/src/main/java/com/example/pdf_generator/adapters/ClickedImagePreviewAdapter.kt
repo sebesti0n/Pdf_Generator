@@ -43,7 +43,6 @@ class ClickedImagePreviewAdapter(val itemClickListner: ItemClickListner):Recycle
         holder: ClickedImageViewHolder,
         position: Int
     ) {
-
         val item=differ.currentList[position]
         holder.image.setImageBitmap(item)
         holder.deleteBtn.setOnClickListener { itemClickListner.onDeleteBtnClick(it, position)}

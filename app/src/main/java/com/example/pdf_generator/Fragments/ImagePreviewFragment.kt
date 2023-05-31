@@ -77,8 +77,6 @@ class ImagePreviewFragment : Fragment(), ItemClickListner {
         super.onViewCreated(view, savedInstanceState)
         setUpRecyclerView()
         updateRecyclerView()
-        Toast.makeText(requireContext(), "size of list: ${viewModel.getListSize()}", Toast.LENGTH_SHORT).show()
-
         binding.openDialogBoxForName.setOnClickListener {
             showDialog()
         }

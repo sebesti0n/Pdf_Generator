@@ -47,4 +47,5 @@
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
     <string name="quickpdf">QuickPDF</string>
+    <string name="recent_documents">Recent Documents</string>
 </resources>

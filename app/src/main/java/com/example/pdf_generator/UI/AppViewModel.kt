@@ -21,7 +21,7 @@ class AppViewModel(): ViewModel(){
         listOfBitmaps.postValue(arrayListOf())
     }
     fun setList(list: ArrayList<Bitmap>){
-        listOfBitmaps.postValue(list)
+        listOfBitmaps.value=list
     }
 
     fun getListSize(): Int{
@@ -43,7 +43,7 @@ class AppViewModel(): ViewModel(){
             list= arrayListOf()
             list.add(bitmap)
         }
-        setList(ArrayList<Bitmap>(list))
+        setList(ArrayList(list))
 
     }
 

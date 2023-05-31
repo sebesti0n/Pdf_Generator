@@ -2,6 +2,7 @@ package com.example.pdf_generator.Fragments
 
 import android.Manifest
 import android.app.Activity.RESULT_OK
+import android.content.ActivityNotFoundException
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -20,8 +21,12 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.pdf_generator.Listner.PdfItemClickListener
+import com.example.pdf_generator.adapters.PdfAdapter
 import com.example.pdf_generator.databinding.FragmentHomeBinding
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -29,13 +34,13 @@ import java.io.FileOutputStream
 import java.io.IOException
 
 
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(), PdfItemClickListener {
 
     private var _binding: FragmentHomeBinding?=null
     private val binding get() = _binding!!
+    private lateinit var listener: PdfItemClickListener
+    private lateinit var adapter: PdfAdapter
 
-    private lateinit var imageuriList:ArrayList<Uri>
-    private lateinit var imageBitmapList:ArrayList<Bitmap>
     var permissionArray = arrayOf<String>(
         Manifest.permission.WRITE_EXTERNAL_STORAGE,
         Manifest.permission.READ_EXTERNAL_STORAGE
@@ -43,6 +48,7 @@ class HomeFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        listener=this
     }
 
     override fun onCreateView(
@@ -56,12 +62,8 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        imageuriList= ArrayList()
-        imageBitmapList= ArrayList()
-        //Permission checking...
-       checkPermissions()
-
+        checkPermissions()
+        getFiles()
         binding.llForScanner.setOnClickListener {
             val action=HomeFragmentDirections.actionHomeFragmentToScannerFragment()
             findNavController().navigate(action)
@@ -71,9 +73,49 @@ class HomeFragment : Fragment() {
             val action=HomeFragmentDirections.actionHomeFragmentToCameraFragment()
             findNavController().navigate(action)
         }
+
         binding.createPdfSelectImageFab.setOnClickListener{
             openGallery()
         }
+    }
+
+    private fun getFiles(){
+        val documentsDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
+        val folderName = "PdfGeneratorDocuments"
+
+        val folder = File(documentsDirectory, folderName)
+        if (folder.exists() && folder.isDirectory) {
+
+            val pdfFiles = folder.listFiles { file ->
+                file.isFile && file.extension.equals("pdf", ignoreCase = true)
+            }
+            setUpRecyclerView(pdfFiles)
+        }
+        else Toast.makeText(requireContext(), "Folder Doesn't Exists", Toast.LENGTH_SHORT).show()
+
+    }
+
+    private fun setUpRecyclerView(files: Array<File>?){
+        adapter= PdfAdapter(files, listener)
+        binding.savedPdfRcv.adapter=adapter
+        binding.savedPdfRcv.layoutManager=LinearLayoutManager(requireContext())
+    }
+
+    private fun openPdf(file: File){
+        val authority = "com.example.pdf_generator.fileprovider"
+
+        val pdfUri = FileProvider.getUriForFile(requireContext(), authority, file)
+
+        val pdfIntent = Intent(Intent.ACTION_VIEW)
+        pdfIntent.setDataAndType(pdfUri, "application/pdf")
+        pdfIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NO_HISTORY
+
+        try {
+            startActivity(pdfIntent)
+        } catch (e: ActivityNotFoundException) {
+            Toast.makeText(requireContext(), "No Pdf Viewer Installed", Toast.LENGTH_SHORT).show()
+        }
+
     }
 
     private fun openGallery() {
@@ -95,86 +137,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode==123 && resultCode==RESULT_OK){
-            if (data != null) {
-                if(data.getClipData()!=null) {
-                    val x = data.getClipData()!!.getItemCount()
-                    for (i in 0 until x)
-                        imageuriList.add(data.getClipData()!!.getItemAt(i).getUri())
-
-                    for(i in imageuriList){
-                        getBitmapFromUri(i)?.let { imageBitmapList.add(it) }
-                    }
-
-                    createPdf(imageBitmapList, "sample ${randomNumberGeneratorForTest()}")
-                }else if(data.data !=null){
-                    val imguri= data.data!!.path
-                    imageuriList.add(Uri.parse(imguri))
-                }
-            }
-                }
-            }
-    private fun randomNumberGeneratorForTest(): Int = kotlin.random.Random.nextInt()
-
-    private fun scaleBitmapToFitScreenWidth(bitmap: Bitmap, screenWidth: Int): Bitmap {
-        val bitmapWidth = bitmap.width
-        val bitmapHeight = bitmap.height
-        val scaledHeight = (screenWidth.toFloat() / bitmapWidth * bitmapHeight).toInt()
-        val processedBitmap = Bitmap.createScaledBitmap(bitmap, screenWidth, scaledHeight, true)
-        val stream = ByteArrayOutputStream()
-        processedBitmap.compress(Bitmap.CompressFormat.WEBP, 50 ,stream)
-        val  byteArray=stream.toByteArray()
-        return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
-    }
-
-    fun createPdf(bitmaps: List<Bitmap>, pdfFileName: String) {
-        if(bitmaps.size==0) {
-            Toast.makeText(requireContext(), "Select some images to proceed", Toast.LENGTH_SHORT).show()
-            return
-        }
-        val pdfDocument = PdfDocument()
-
-        val displayMetrics = Resources.getSystem().displayMetrics
-        val screenWidth = displayMetrics.widthPixels
-        for (bitmap in bitmaps) {
-            val scaledBitmap = scaleBitmapToFitScreenWidth(bitmap, screenWidth)
-            val pageInfo = PdfDocument.PageInfo.Builder(scaledBitmap.width, scaledBitmap.height, pdfDocument.pages.size + 1).create()
-            val page = pdfDocument.startPage(pageInfo)
-            page.canvas.drawBitmap(scaledBitmap, 0f, 0f, null)
-            pdfDocument.finishPage(page)
-        }
-        val directory = Environment.getExternalStoragePublicDirectory("PdfGeneratorDocuments")
-        if (!directory.exists()) {directory.mkdirs()}
-
-        val pdfFilePath = "${directory.path}/$pdfFileName.pdf"
-        val pdfFile = File(pdfFilePath)
-
-        try {
-            pdfDocument.writeTo(FileOutputStream(pdfFile))
-            pdfDocument.close()
-            Toast.makeText(requireContext(), "${pdfFileName}.pdf saved successfully", Toast.LENGTH_SHORT).show()
-        } catch (e: IOException) {
-            Log.w(ContentValues.TAG, "Error while creating Pdf: ${e}")
-            Toast.makeText(requireContext(), "Failed to create PDF", Toast.LENGTH_SHORT).show()
-        }
-
-//        val action=HomeFragmentDirections.actionHomeFragmentToCameraFragment()
-//        findNavController().navigate(action)
-    }
-    private fun getBitmapFromUri(it: Uri): Bitmap? {
-        return try {
-            val inputStream = requireContext().contentResolver.openInputStream(it)
-            BitmapFactory.decodeStream(inputStream)
-        } catch (e: Exception) {
-            Toast.makeText(
-                requireContext(),
-                "Failed to load image: ${e.message}",
-                Toast.LENGTH_SHORT
-            ).show()
-            null
-        }
+    override fun pdfItemClicked(file: File) {
+        openPdf(file)
     }
 }
