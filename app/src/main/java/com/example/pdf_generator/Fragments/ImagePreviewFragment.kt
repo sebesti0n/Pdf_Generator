@@ -148,7 +148,10 @@ class ImagePreviewFragment : Fragment(), ItemClickListner {
             page.canvas.drawBitmap(scaledBitmap, 0f, 0f, null)
             pdfDocument.finishPage(page)
         }
-        val directory = Environment.getExternalStoragePublicDirectory("PdfGeneratorDocuments")
+
+        val documentsDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
+        val directoryName = "pdfGeneratorDocuments"
+        val directory=File(documentsDirectory, directoryName)
         if (!directory.exists()) {directory.mkdirs()}
 
         val pdfFilePath = "${directory.path}/$pdfFileName.pdf"
