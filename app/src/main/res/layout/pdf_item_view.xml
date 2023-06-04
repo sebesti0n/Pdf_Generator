@@ -7,26 +7,41 @@
     app:cardElevation="12dp"
     android:layout_height="wrap_content">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:orientation="horizontal"
+
         android:layout_height="wrap_content">
 
         <com.google.android.material.imageview.ShapeableImageView
             android:layout_width="50dp"
             android:src="@drawable/ic_pdf_file"
+            android:id="@+id/pdfiv"
             android:layout_marginLeft="4dp"
             android:layout_height="50dp"/>
 
         <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/file_name_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="17dp"
-            android:id="@+id/file_name_tv"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="56dp"
+
+            android:layout_marginTop="13dp"
+            android:text="pdf name"
             android:textColor="@color/black"
-            android:layout_gravity="center_vertical"
-            android:layout_marginRight="4dp"
-            android:text="pdf name"/>
-    </LinearLayout>
+            android:textSize="17dp" />
+
+        <TextView
+            android:id="@+id/popupMenuBtn"
+            android:layout_width="20dp"
+            android:layout_height="30dp"
+
+            android:layout_alignParentStart="true"
+
+            android:layout_marginStart="374dp"
+            android:text="⋮"
+            android:textAppearance="?android:textAppearanceLarge"
+            android:textStyle="bold" />
+    </RelativeLayout>
 
 </androidx.cardview.widget.CardView>

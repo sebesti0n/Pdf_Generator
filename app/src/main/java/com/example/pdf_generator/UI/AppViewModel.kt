@@ -1,18 +1,8 @@
 package com.example.pdf_generator.UI
 
-import android.content.ContentValues
-import android.content.res.Resources
 import android.graphics.Bitmap
-import android.graphics.pdf.PdfDocument
-import android.os.Environment
-import android.util.Log
-import android.widget.Toast
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
 
 class AppViewModel(): ViewModel(){
      var listOfBitmaps: MutableLiveData<ArrayList<Bitmap>?> = MutableLiveData()

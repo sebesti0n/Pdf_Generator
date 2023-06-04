@@ -1,7 +1,9 @@
 package com.example.pdf_generator.Fragments
 
 import android.Manifest
+import android.content.ActivityNotFoundException
 import android.content.ContentValues
+import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -16,19 +18,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.pdf_generator.Activities.MainActivity
 import com.example.pdf_generator.Listener.ItemClickListner
-
 import com.example.pdf_generator.R
 import com.example.pdf_generator.UI.AppViewModel
 import com.example.pdf_generator.adapters.ClickedImagePreviewAdapter
 import com.example.pdf_generator.databinding.FragmentImagePreviewBinding
-import com.pspdfkit.configuration.activity.PdfActivityConfiguration
-import com.pspdfkit.ui.PdfActivity
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -114,16 +114,36 @@ class ImagePreviewFragment : Fragment(), ItemClickListner {
     }
 
     private fun openDoc(pdfFileName: String) {
-        val documentsDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
+           val documentsDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
         val directoryName = "pdfGeneratorDocuments"
         val directory=File(documentsDirectory, directoryName)
         if (!directory.exists()) {directory.mkdirs()}
-
+//
         val pdfFilePath = "${directory.path}/$pdfFileName.pdf"
         val pdfFile = File(pdfFilePath)
-        val uri = Uri.fromFile( pdfFile)
-        val config = context?.let { PdfActivityConfiguration.Builder(it).build() }
-        PdfActivity.showDocument(requireContext(), uri, config)
+        val authority = "com.example.pdf_generator.fileprovider"
+
+        val pdfUri = FileProvider.getUriForFile(requireContext(), authority, pdfFile)
+
+        val pdfIntent = Intent(Intent.ACTION_VIEW)
+        pdfIntent.setDataAndType(pdfUri, "application/pdf")
+        pdfIntent.flags =
+            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NO_HISTORY
+
+        try {
+            pdfIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(pdfIntent)
+            val action = ImagePreviewFragmentDirections.actionImagePreviewFragmentToHomeFragment()
+            findNavController().navigate(action)
+        } catch (e: ActivityNotFoundException) {
+            Toast.makeText(requireContext(), "No Pdf Viewer Installed", Toast.LENGTH_SHORT)
+                .show()
+        }
+
+//
+//        val uri = Uri.fromFile( pdfFile)
+//        val config = context?.let { PdfActivityConfiguration.Builder(it).build() }
+//        PdfActivity.showDocument(requireContext(), uri, config)
     }
 
     private fun scaleBitmapToFitScreenWidth(bitmap: Bitmap, screenWidth: Int): Bitmap {

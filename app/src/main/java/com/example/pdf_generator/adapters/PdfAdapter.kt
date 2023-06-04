@@ -5,13 +5,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.pdf_generator.Listner.PdfItemClickListener
+import com.example.pdf_generator.Listener.PdfItemClickListener
 import com.example.pdf_generator.R
 import java.io.File
 
 class PdfAdapter(val list: Array<File>?,val listener: PdfItemClickListener): RecyclerView.Adapter<PdfAdapter.PdfViewHolder>(){
     class PdfViewHolder(val view: View): RecyclerView.ViewHolder(view){
         val name: TextView =view.findViewById(R.id.file_name_tv)
+        val popupmenuBtn:TextView= view.findViewById(R.id.popupMenuBtn)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PdfViewHolder {
@@ -27,6 +28,9 @@ class PdfAdapter(val list: Array<File>?,val listener: PdfItemClickListener): Rec
         holder.name.text=file.name
         holder.itemView.setOnClickListener {
             listener.pdfItemClicked(file)
+        }
+        holder.popupmenuBtn.setOnClickListener {
+                listener.onPopupMenuBtnClicked(position)
         }
     }
 }
