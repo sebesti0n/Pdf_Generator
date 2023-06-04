@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".Fragments.HomeFragment">
 
@@ -11,6 +13,8 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:id="@+id/toolbar"/>
+
+
 
     <LinearLayout
         android:id="@+id/ll_for_options"
@@ -105,24 +109,74 @@
         </LinearLayout>
 
     </LinearLayout>
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/recent_documents_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="4dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginRight="4dp"
-        android:gravity="start"
-        android:text="@string/recent_documents"
-        android:textColor="@color/black"
-        android:textSize="15sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/saved_pdf_rcv"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:id="@+id/ll2"
         app:layout_constraintHorizontal_bias="0.043"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ll_for_options" />
+        app:layout_constraintTop_toBottomOf="@id/ll_for_options"
+        android:layout_height="wrap_content">
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/recent_documents_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginRight="4dp"
+            android:gravity="start"
+            android:layout_weight="4"
+            android:text="@string/recent_documents"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:layout_width="0dp"
+            android:layout_marginRight="8dp"
+            android:layout_weight="1"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:src="@drawable/ic_search"
+            android:id="@+id/search_iv"
+            android:layout_marginLeft="12dp"
+            android:layout_height="35dp"
+            />
+    </LinearLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_marginEnd="12dp"
+        android:layout_marginStart="12dp"
+        app:hintEnabled="true"
+        app:boxStrokeWidth="1dp"
+        android:visibility="gone"
+        app:boxCornerRadiusTopEnd="12dp"
+        app:boxCornerRadiusBottomEnd="12dp"
+        app:boxCornerRadiusBottomStart="12dp"
+        app:boxCornerRadiusTopStart="12dp"
+        android:id="@+id/search_bar"
+        android:hint="Search Documents"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_height="wrap_content"
+        app:boxStrokeColor="@color/blueDark"
+        app:boxBackgroundColor="@color/lightblue"
+        app:layout_constraintTop_toBottomOf="@id/ll2"
+        app:layout_constraintBottom_toTopOf="@id/saved_pdf_rcv"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:id="@+id/search_bar_edit_text"
+            android:layout_height="40dp"
+            android:padding="4dp"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/saved_pdf_rcv"
@@ -131,10 +185,10 @@
         app:layout_constrainedHeight="true"
         android:layout_margin="4dp"
         android:background="@color/lightblue"
-        app:layout_constraintTop_toBottomOf="@id/recent_documents_tv"
+        app:layout_constraintTop_toBottomOf="@id/search_bar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

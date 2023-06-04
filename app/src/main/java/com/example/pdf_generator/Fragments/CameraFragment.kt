@@ -24,6 +24,7 @@ import androidx.camera.core.*
 import androidx.camera.core.ImageCapture.FLASH_MODE_AUTO
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.pdf_generator.Activities.MainActivity
@@ -193,9 +194,9 @@ class CameraFragment : Fragment()
 
                     val capturedBitmap = savedUri?.let { getBitmapFromUri(it) }
                     capturedBitmap?.let { it->
-                        binding.ClickedImageIv.setImageBitmap(it)
-                        binding.ClickedImage.visibility=View.VISIBLE
-                        binding.saveBtn.visibility=View.VISIBLE
+                        binding.clickedImageIv.visibility=View.VISIBLE
+                        binding.clickedImageIv.setImageBitmap(it)
+                        binding.saveBtn.isVisible=true
                         viewModel.addElementToList(it)
                     }
                 }

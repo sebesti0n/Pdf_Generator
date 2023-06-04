@@ -44,6 +44,7 @@ class ImagePreviewFragment : Fragment(), ItemClickListner {
     private lateinit var adapter: ClickedImagePreviewAdapter
     private lateinit var viewModel: AppViewModel
     private lateinit var listener: ItemClickListner
+
     companion object {
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         val REQUIRED_PERMISSIONS =
@@ -110,7 +111,6 @@ class ImagePreviewFragment : Fragment(), ItemClickListner {
             show()
 
         }
-
     }
 
     private fun openDoc(pdfFileName: String) {
@@ -139,11 +139,6 @@ class ImagePreviewFragment : Fragment(), ItemClickListner {
             Toast.makeText(requireContext(), "No Pdf Viewer Installed", Toast.LENGTH_SHORT)
                 .show()
         }
-
-//
-//        val uri = Uri.fromFile( pdfFile)
-//        val config = context?.let { PdfActivityConfiguration.Builder(it).build() }
-//        PdfActivity.showDocument(requireContext(), uri, config)
     }
 
     private fun scaleBitmapToFitScreenWidth(bitmap: Bitmap, screenWidth: Int): Bitmap {

@@ -1,86 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="@color/black"
+    android:layout_height="match_parent"
     tools:context=".Activities.MainActivity">
-        <androidx.appcompat.widget.LinearLayoutCompat
+        <LinearLayout
             android:id="@+id/ll_above_options"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_marginTop="8dp"
+            android:layout_height="wrap_content"
             app:layout_constraintBottom_toTopOf="@id/viewFinder"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:orientation="horizontal"
-            >
-                <androidx.cardview.widget.CardView
+            android:orientation="horizontal">
 
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:backgroundTint="@color/cameraShutterRegion"
-                    android:layout_weight="1">
-                        <ImageButton
-                            android:id="@+id/home_btn"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:src="@drawable/ic_home"
-                            android:backgroundTint="@color/cameraShutterRegion"
-                            />
-
-                </androidx.cardview.widget.CardView>
-                <androidx.cardview.widget.CardView
-
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:backgroundTint="@color/cameraShutterRegion"
-                    android:layout_weight="1">
-                        <ImageButton
-                            android:id="@+id/flash_auto_btn"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:src="@drawable/ic_flash_auto"
-                            android:backgroundTint="@color/cameraShutterRegion"
-                            />
-
-                </androidx.cardview.widget.CardView>
-                <androidx.cardview.widget.CardView
-
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:backgroundTint="@color/cameraShutterRegion"
-                    android:layout_weight="1">
-                        <ImageButton
-                            android:id="@+id/flash_on_btn"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:src="@drawable/ic_flash_on"
-                            android:backgroundTint="@color/cameraShutterRegion"
-                            />
-
-                </androidx.cardview.widget.CardView>
-                <androidx.cardview.widget.CardView
-
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:backgroundTint="@color/cameraShutterRegion"
-                    android:layout_weight="1">
-                        <ImageButton
-                            android:id="@+id/flash_off_btn"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:src="@drawable/ic_flash_off"
-                            android:backgroundTint="@color/cameraShutterRegion"
-                            />
-
-                </androidx.cardview.widget.CardView>
-
-
-
-        </androidx.appcompat.widget.LinearLayoutCompat>
+            <com.google.android.material.imageview.ShapeableImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:id="@+id/home_btn"
+                android:clickable="true"
+                android:layout_weight="1"
+                android:src="@drawable/ic_home"
+                android:focusable="true" />
+            <com.google.android.material.imageview.ShapeableImageView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:layout_marginTop="2dp"
+                android:id="@+id/flash_auto_btn"
+                android:clickable="true"
+                android:src="@drawable/ic_flash_auto"
+                android:focusable="true" />
+            <com.google.android.material.imageview.ShapeableImageView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:layout_marginTop="2dp"
+                android:id="@+id/flash_off_btn"
+                android:clickable="true"
+                android:src="@drawable/ic_flash_off"
+                android:focusable="true" />
+            <com.google.android.material.imageview.ShapeableImageView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:layout_marginTop="2dp"
+                android:id="@+id/flash_on_btn"
+                android:clickable="true"
+                android:src="@drawable/ic_flash_on"
+                android:focusable="true" />
+        </LinearLayout>
 
         <androidx.camera.view.PreviewView
             android:id="@+id/viewFinder"
@@ -93,104 +67,67 @@
             android:layout_height="match_parent" />
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="100dp"
             android:id="@+id/ll_cameraShutter_Region"
-            android:orientation="vertical"
-            android:background="@color/cameraShutterRegion"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/viewFinder">
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/options_linear_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="150dp">
+            android:layout_marginTop="-120dp">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:layout_height="match_parent">
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:layout_height="80dp"
+                    android:layout_width="60dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginStart="20dp"
+                    android:visibility="gone"
+                    android:id="@+id/clicked_image_iv"
+                    app:layout_constraintLeft_toLeftOf="@id/ll_cameraShutter_Region"
+                    app:layout_constraintBottom_toBottomOf="@id/ll_cameraShutter_Region"
+                    app:layout_constraintTop_toTopOf="@id/ll_cameraShutter_Region"
+                    android:src="@color/blueDark"
+                    />
+            </LinearLayout>
 
-<!--                        <androidx.appcompat.widget.AppCompatImageView-->
-<!--                            android:layout_width="wrap_content"-->
-<!--                            android:layout_height="wrap_content"-->
-<!--                            android:src="@drawable/ic_camera_"-->
-<!--                            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--                            app:layout_constraintEnd_toStartOf="@+id/capture_btn"-->
-<!--                            app:layout_constraintStart_toStartOf="parent"-->
-<!--                            app:layout_constraintTop_toTopOf="parent" />-->
-                        <RelativeLayout
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:padding="10dp"
-                            android:id="@+id/mainLayout"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@+id/capture_btn"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
-                            <androidx.cardview.widget.CardView
-                                android:id="@+id/Clicked_image"
-                                android:layout_width="65dp"
-                                android:layout_height="65dp"
-                                app:cardCornerRadius="100dp"
-                                android:visibility="gone"
-                                >
-
-                             <ImageView
-                                 android:id="@+id/Clicked_image_iv"
-                                 android:layout_width="match_parent"
-                                 android:layout_height="match_parent"
-
-                                 android:scaleType="centerCrop"
-                                 android:adjustViewBounds="true"
-                                 />
-                            </androidx.cardview.widget.CardView>
-
-
-<!--                                <ProgressBar-->
-<!--                                    android:id="@+id/clicked_image_progressBar"-->
-<!--                                    android:layout_width="65dp"-->
-<!--                                    android:layout_height="65dp"-->
-<!--                                    android:layout_alignStart="@+id/Clicked_image"-->
-<!--                                    android:layout_alignTop="@+id/Clicked_image"-->
-<!--                                    android:background="@drawable/circle_shape"-->
-<!--                                    android:max="100"-->
-<!--                                    android:padding="1dp"-->
-<!--                                    android:progress="65"-->
-<!--                                    android:progressDrawable="@drawable/circular_progress_bar"-->
-<!--                                    />-->
-                        </RelativeLayout>
-
-                        <android.widget.Button
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:layout_height="match_parent">
+                <com.google.android.material.button.MaterialButton
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:gravity="center"
+                    app:layout_constraintTop_toTopOf="@id/ll_cameraShutter_Region"
+                    app:layout_constraintBottom_toBottomOf="@id/ll_cameraShutter_Region"
+                    app:layout_constraintLeft_toRightOf="@id/clicked_image_iv"
+                    app:layout_constraintRight_toLeftOf="@id/save_btn"
                     android:id="@+id/capture_btn"
-                    android:layout_width="65dp"
-                    android:layout_height="65dp"
-                    android:layout_marginLeft="12dp"
-                    android:background="@drawable/round_button"
-                    android:layout_marginRight="12dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    android:backgroundTintMode="add"
-                    android:backgroundTint="@color/white"
+                    app:cornerRadius="35dp"
+                    style="@style/ShapeAppearanceOverlay.Material3.Button"
+                    android:backgroundTint="@color/white"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:layout_height="match_parent">
+                <com.google.android.material.button.MaterialButton
+                    android:layout_width="80dp"
+                    android:layout_height="60dp"
+                    android:text="Save"
+                    android:visibility="gone"
+                    app:strokeWidth="1dp"
+                    app:cornerRadius="18dp"
+                    app:strokeColor="@color/white"
+                    android:textColor="@color/white"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    app:layout_constraintRight_toRightOf="@id/ll_cameraShutter_Region"
+                    app:layout_constraintTop_toTopOf="@id/ll_cameraShutter_Region"
+                    app:layout_constraintBottom_toBottomOf="@id/ll_cameraShutter_Region"
+                    android:id="@+id/save_btn"/>
+            </LinearLayout>
+            </LinearLayout>
 
 
-                        />
-
-
-                        <android.widget.Button
-                            android:id="@+id/save_btn"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="NEXT"
-                            android:textColor="@color/black"
-                            android:visibility="gone"
-                            android:background="@drawable/rounded_corner_button"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/capture_btn"
-                            app:layout_constraintTop_toTopOf="parent"
-                            android:elevation="200dp"
-                            />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-        </LinearLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

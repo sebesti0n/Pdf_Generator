@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:paddingTop="12dp"
+    android:gravity="center"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_height="wrap_content">
     <com.google.android.material.imageview.ShapeableImageView
@@ -15,30 +16,15 @@
         android:layout_marginStart="12dp"
         android:layout_height="50dp"
         />
-    <TextView
-        android:layout_width="0dp"
+    <com.google.android.material.textview.MaterialTextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:fontFamily="sans-serif-black"
-        android:layout_marginTop="8dp"
+        android:text="QuickPDF"
+        android:layout_marginEnd="35dp"
         android:textSize="24sp"
-        android:layout_weight="2.5"
-        android:textColor="@color/black"
-        android:text="@string/quickpdf"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toRightOf="@id/logo_iv"/>
-    <com.google.android.material.imageview.ShapeableImageView
-        android:layout_width="50dp"
-        android:layout_marginRight="12dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:src="@drawable/ic_search"
-        android:id="@+id/search_iv"
-        android:scaleType="centerCrop"
-        android:layout_marginLeft="12dp"
-        android:layout_height="50dp"
-        />
+        android:layout_marginStart="8dp"
+        android:textStyle="bold"
+        android:layout_gravity="center_vertical"
+        android:textColor="@color/black"/>
+
 </LinearLayout>
