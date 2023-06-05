@@ -16,6 +16,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.activity.addCallback
 
@@ -23,6 +24,7 @@ import androidx.activity.result.ActivityResultLauncher
 
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,6 +32,7 @@ import com.example.pdf_generator.adapters.PdfAdapter
 import com.example.pdf_generator.Activities.CaptureActiv
 import com.example.pdf_generator.Activities.MainActivity
 import com.example.pdf_generator.Listener.PdfItemClickListener
+import com.example.pdf_generator.R
 import com.example.pdf_generator.UI.AppViewModel
 import com.example.pdf_generator.databinding.FragmentHomeBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -50,7 +53,9 @@ class HomeFragment : Fragment(), PdfItemClickListener {
     private lateinit var listener: PdfItemClickListener
     private lateinit var adapter: PdfAdapter
     private var isSearchBarVisible: Boolean =false
-    private var pdfFiles: List<File>?=null
+    private var pdfFiles: MutableList<File>?=null
+//    private var arrray:Array<Int>?=null
+
 
     var permissionArray = arrayOf<String>(
         Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -85,6 +90,7 @@ class HomeFragment : Fragment(), PdfItemClickListener {
             search()
 
         }
+
             binding.scannerBtn
                 .setOnClickListener {
                     scanQR()
@@ -121,7 +127,7 @@ class HomeFragment : Fragment(), PdfItemClickListener {
 
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                     val files=pdfFiles
-                    setUpRecyclerView(files?.filter{ it.name.startsWith(s.toString(), ignoreCase = true)})
+                    setUpRecyclerView(files?.filter{ it.name.startsWith(s.toString(), ignoreCase = true)} as MutableList<File>?)
                 }
 
                 override fun afterTextChanged(s: Editable?) {
@@ -212,16 +218,17 @@ class HomeFragment : Fragment(), PdfItemClickListener {
             val folder = File(documentsDirectory, folderName)
             if (folder.exists() && folder.isDirectory) {
 
-                pdfFiles = folder.listFiles { file ->
+               pdfFiles = folder.listFiles { file ->
                     file.extension.equals("pdf", ignoreCase = true)
-                }?.toList()
+                }?.toMutableList()
+
                 setUpRecyclerView(pdfFiles)
             } else Toast.makeText(requireContext(), "Folder Doesn't Exists", Toast.LENGTH_SHORT)
                 .show()
 
         }
 
-        private fun setUpRecyclerView(files: List<File>?) {
+        private fun setUpRecyclerView(files: MutableList<File>?) {
             adapter = PdfAdapter(files, listener)
             binding.savedPdfRcv.adapter = adapter
             binding.savedPdfRcv.layoutManager = LinearLayoutManager(requireContext())
@@ -307,7 +314,82 @@ class HomeFragment : Fragment(), PdfItemClickListener {
         }
 
     override fun onPopupMenuBtnClicked(position: Int) {
+        val popupMenu=PopupMenu(requireContext(),binding.savedPdfRcv[position].findViewById(R.id.popupMenuBtn))
+        popupMenu.inflate(R.menu.popupmenu)
+        popupMenu.setOnMenuItemClickListener {
+            when(it.itemId){
+                R.id.share_btn->{
+                    sharePdf(position)
+                    return@setOnMenuItemClickListener true
+                }
+                R.id.delete_btn->{
+//                   Toast.makeText(requireContext(),"In Process....",Toast.LENGTH_SHORT).show()
+                    deletePdf(position)
+                    return@setOnMenuItemClickListener true
+                }
 
+            }
+            return@setOnMenuItemClickListener false
+        }
+        popupMenu.show()
+    }
+
+    private fun deletePdf(position: Int) {
+        val tempFile= pdfFiles?.get(position)
+        openDialogforDeleteAlert(tempFile,position)
+    }
+
+    private fun openDialogforDeleteAlert(tempFile: File?, position: Int) {
+
+
+            val builder = MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Delete")
+                .setMessage("Are you sure want to delete this item?")
+                .setNeutralButton("Cancel") { _, which ->
+                }
+                .setPositiveButton("Delete") { _, which ->
+                }
+            val dialog = builder.show()
+            dialog.getButton(-1).setOnClickListener {
+
+                dialog.dismiss()
+                tempFile?.delete()
+                pdfFiles?.removeAt(position)
+                adapter.notifyItemRemoved(position)
+            }
+            dialog.getButton(-2).setOnClickListener {
+
+                dialog.dismiss()
+
+            }
+
+    }
+
+    private fun sharePdf(position: Int) {
+        val authority = "com.example.pdf_generator.fileprovider"
+
+        val uri =
+            pdfFiles?.get(position)?.let {
+                FileProvider.getUriForFile(requireContext(), authority,
+                    it
+                )
+            }
+
+        val intent = Intent(Intent.ACTION_SEND)
+
+
+        intent.putExtra(Intent.EXTRA_STREAM, uri)
+
+
+//        intent.putExtra(Intent.EXTRA_TEXT, "Sharing Image")
+
+
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Subject Here")
+
+
+        intent.type = "application/pdf"
+
+        startActivity(Intent.createChooser(intent, "Share Via"))
     }
 }
 

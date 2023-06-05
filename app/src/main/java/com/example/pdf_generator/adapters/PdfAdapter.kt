@@ -10,7 +10,7 @@ import com.example.pdf_generator.Listener.PdfItemClickListener
 import com.example.pdf_generator.R
 import java.io.File
 
-class PdfAdapter(val list: List<File>?, val listener: PdfItemClickListener): RecyclerView.Adapter<PdfAdapter.PdfViewHolder>(){
+class PdfAdapter(val list: MutableList<File>?, val listener: PdfItemClickListener): RecyclerView.Adapter<PdfAdapter.PdfViewHolder>(){
     class PdfViewHolder(val view: View): RecyclerView.ViewHolder(view){
         val name: TextView =view.findViewById(R.id.file_name_tv)
         val popupmenuBtn: ImageView = view.findViewById(R.id.popupMenuBtn)
