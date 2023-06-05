@@ -228,7 +228,7 @@ class HomeFragment : Fragment(), PdfItemClickListener {
         }
 
         private fun openPdf(file: File) {
-            val authority = "com.example.pdf_generator.file-provider"
+            val authority = "com.example.pdf_generator.fileprovider"
 
             val pdfUri = FileProvider.getUriForFile(requireContext(), authority, file)
 
