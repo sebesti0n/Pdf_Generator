@@ -37,5 +37,9 @@ class AppViewModel(): ViewModel(){
 
     }
 
+    fun clearList(){
+        setList(arrayListOf())
+    }
+
 
 }

@@ -181,6 +181,7 @@ class ImagePreviewFragment : Fragment(), ItemClickListner {
             pdfDocument.writeTo(FileOutputStream(pdfFile))
             pdfDocument.close()
             Toast.makeText(requireContext(), "${pdfFileName}.pdf saved successfully", Toast.LENGTH_SHORT).show()
+            viewModel.clearList()
         } catch (e: IOException) {
             Log.w(ContentValues.TAG, "Error while creating Pdf: ${e}")
             Toast.makeText(requireContext(), "Failed to create PDF", Toast.LENGTH_SHORT).show()

@@ -3,22 +3,21 @@ package com.example.pdf_generator.Fragments
 import android.Manifest
 import android.app.Activity.RESULT_OK
 import android.content.ActivityNotFoundException
-import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.pdf.PdfDocument
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.addCallback
 
 import androidx.activity.result.ActivityResultLauncher
 
@@ -50,6 +49,8 @@ class HomeFragment : Fragment(), PdfItemClickListener {
     private lateinit var imageBitmapList: ArrayList<Bitmap>
     private lateinit var listener: PdfItemClickListener
     private lateinit var adapter: PdfAdapter
+    private var isSearchBarVisible: Boolean =false
+    private var pdfFiles: List<File>?=null
 
     var permissionArray = arrayOf<String>(
         Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -81,13 +82,12 @@ class HomeFragment : Fragment(), PdfItemClickListener {
             //Permission checking...
             checkPermissions()
         binding.searchIv.setOnClickListener {
-            binding.searchBar.visibility = View.VISIBLE
+            search()
+
         }
             binding.scannerBtn
                 .setOnClickListener {
                     scanQR()
-//                    val action = HomeFragmentDirections.actionHomeFragmentToScannerFragment()
-//                    findNavController().navigate(action)
                 }
 
             binding.createPdfFab.setOnClickListener {
@@ -97,12 +97,56 @@ class HomeFragment : Fragment(), PdfItemClickListener {
 
             binding.createPdfSelectImageFab.setOnClickListener {
                 openGallery()
-//                val action=omeFragmentDirections.actionHomeFragmentToGalleryFragment()
-//                findNavController().navigate(action)
             }
         }
 
-        private fun scanQR() {
+        private fun search(){
+            if(isSearchBarVisible) {
+                isSearchBarVisible=false
+                binding.searchBar.visibility = View.GONE
+                setUpRecyclerView(pdfFiles)
+                return
+            }
+            isSearchBarVisible=true
+            binding.searchBar.visibility=View.VISIBLE
+            binding.searchBarEditText.addTextChangedListener(object: TextWatcher{
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {
+
+                }
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    val files=pdfFiles
+                    setUpRecyclerView(files?.filter{ it.name.startsWith(s.toString(), ignoreCase = true)})
+                }
+
+                override fun afterTextChanged(s: Editable?) {
+
+                }
+
+            })
+        }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback(requireActivity()) {
+            if(isSearchBarVisible){
+                isSearchBarVisible=false
+                binding.searchBar.visibility=View.GONE
+                setUpRecyclerView(pdfFiles)
+            }
+            else{
+                requireActivity().finish()
+            }
+        }
+    }
+
+
+    private fun scanQR() {
             val options: ScanOptions = ScanOptions()
             options.setBeepEnabled(true)
             options.setOrientationLocked(true)
@@ -168,16 +212,16 @@ class HomeFragment : Fragment(), PdfItemClickListener {
             val folder = File(documentsDirectory, folderName)
             if (folder.exists() && folder.isDirectory) {
 
-                val pdfFiles = folder.listFiles { file ->
-                    file.isFile && file.extension.equals("pdf", ignoreCase = true)
-                }
+                pdfFiles = folder.listFiles { file ->
+                    file.extension.equals("pdf", ignoreCase = true)
+                }?.toList()
                 setUpRecyclerView(pdfFiles)
             } else Toast.makeText(requireContext(), "Folder Doesn't Exists", Toast.LENGTH_SHORT)
                 .show()
 
         }
 
-        private fun setUpRecyclerView(files: Array<File>?) {
+        private fun setUpRecyclerView(files: List<File>?) {
             adapter = PdfAdapter(files, listener)
             binding.savedPdfRcv.adapter = adapter
             binding.savedPdfRcv.layoutManager = LinearLayoutManager(requireContext())
