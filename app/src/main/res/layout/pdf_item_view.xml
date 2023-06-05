@@ -35,9 +35,9 @@
             android:id="@+id/popupMenuBtn"
             android:layout_width="20dp"
             android:layout_height="30dp"
-            android:src="@drawable/ic_threedots"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="374dp"
+            android:src="@drawable/ic_three_dots"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="4dp"
             />
     </RelativeLayout>
 

@@ -199,7 +199,6 @@ class HomeFragment : Fragment(), PdfItemClickListener {
                 Toast.makeText(requireContext(), "No Pdf Viewer Installed", Toast.LENGTH_SHORT)
                     .show()
             }
-
         }
 
         private fun openGallery() {
@@ -264,7 +263,7 @@ class HomeFragment : Fragment(), PdfItemClickListener {
         }
 
     override fun onPopupMenuBtnClicked(position: Int) {
-        TODO("Not yet implemented")
+
     }
 }
 
