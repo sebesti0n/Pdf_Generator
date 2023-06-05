@@ -80,10 +80,14 @@ class HomeFragment : Fragment(), PdfItemClickListener {
             imageBitmapList = ArrayList()
             //Permission checking...
             checkPermissions()
-
+        binding.searchIv.setOnClickListener {
+            binding.searchBar.visibility = View.VISIBLE
+        }
             binding.scannerBtn
                 .setOnClickListener {
                     scanQR()
+//                    val action = HomeFragmentDirections.actionHomeFragmentToScannerFragment()
+//                    findNavController().navigate(action)
                 }
 
             binding.createPdfFab.setOnClickListener {
@@ -93,6 +97,8 @@ class HomeFragment : Fragment(), PdfItemClickListener {
 
             binding.createPdfSelectImageFab.setOnClickListener {
                 openGallery()
+//                val action=omeFragmentDirections.actionHomeFragmentToGalleryFragment()
+//                findNavController().navigate(action)
             }
         }
 

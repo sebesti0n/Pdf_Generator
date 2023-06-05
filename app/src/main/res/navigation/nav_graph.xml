@@ -19,6 +19,9 @@
         <action
             android:id="@+id/action_homeFragment_to_imagePreviewFragment"
             app:destination="@id/imagePreviewFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_galleryFragment"
+            app:destination="@id/galleryFragment" />
     </fragment>
     <fragment
         android:id="@+id/cameraFragment"
@@ -51,6 +54,18 @@
         tools:layout="@layout/fragment_scanner" >
         <action
             android:id="@+id/action_scannerFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/galleryFragment"
+        android:name="com.example.pdf_generator.Fragments.GalleryFragment"
+        android:label="fragment_gallery"
+        tools:layout="@layout/fragment_gallery" >
+        <action
+            android:id="@+id/action_galleryFragment_to_imagePreviewFragment"
+            app:destination="@id/imagePreviewFragment" />
+        <action
+            android:id="@+id/action_galleryFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
     </fragment>
 

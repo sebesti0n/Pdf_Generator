@@ -182,13 +182,13 @@
         android:id="@+id/saved_pdf_rcv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constrainedHeight="true"
+
         android:layout_margin="4dp"
         android:background="@color/lightblue"
         app:layout_constraintTop_toBottomOf="@id/search_bar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+
         app:layout_constraintStart_toStartOf="parent" />
 
 </LinearLayout>

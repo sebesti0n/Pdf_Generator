@@ -31,17 +31,14 @@
             android:textColor="@color/black"
             android:textSize="17dp" />
 
-        <TextView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/popupMenuBtn"
             android:layout_width="20dp"
             android:layout_height="30dp"
-
+            android:src="@drawable/ic_threedots"
             android:layout_alignParentStart="true"
-
             android:layout_marginStart="374dp"
-            android:text="⋮"
-            android:textAppearance="?android:textAppearanceLarge"
-            android:textStyle="bold" />
+            />
     </RelativeLayout>
 
 </androidx.cardview.widget.CardView>
