@@ -1,6 +1,7 @@
 package com.example.pdf_generator.Fragments
 
 import android.Manifest
+import android.app.ProgressDialog
 import android.content.ActivityNotFoundException
 import android.content.ContentValues
 import android.content.Intent
@@ -29,6 +30,7 @@ import com.example.pdf_generator.R
 import com.example.pdf_generator.UI.AppViewModel
 import com.example.pdf_generator.adapters.ClickedImagePreviewAdapter
 import com.example.pdf_generator.databinding.FragmentImagePreviewBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -44,6 +46,9 @@ class ImagePreviewFragment : Fragment(), ItemClickListner {
     private lateinit var adapter: ClickedImagePreviewAdapter
     private lateinit var viewModel: AppViewModel
     private lateinit var listener: ItemClickListner
+    private lateinit var temp:String
+    private lateinit var mProgressDialog:ProgressDialog
+
 
     companion object {
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
@@ -70,10 +75,11 @@ class ImagePreviewFragment : Fragment(), ItemClickListner {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         setUpRecyclerView()
         updateRecyclerView()
         binding.openDialogBoxForName.setOnClickListener {
-            showDialog()
+            buildDialogBox()
         }
 
     }
@@ -87,40 +93,54 @@ class ImagePreviewFragment : Fragment(), ItemClickListner {
         binding.RVImageGrid.layoutManager=GridLayoutManager(requireContext(), 3)
     }
 
-    private fun showDialog() {
-        val builder = AlertDialog.Builder(requireContext())
+
+    var isDialogBoxShowing = true
+    private fun buildDialogBox() {
         val inflater = layoutInflater
         val dialogLayout = inflater.inflate(R.layout.dialoglayout, null)
         val editText = dialogLayout.findViewById<EditText>(R.id.et_pdfname)
-        with(builder) {
-            setPositiveButton("Create") { dialog, which ->
-                val temp = editText.text.toString()
-                if (temp.isEmpty()) {
-                    Toast.makeText(requireContext(), "Enter Pdf Name!", Toast.LENGTH_LONG).show()
-
-                } else {
-                    createPdf(viewModel.listOfBitmaps.value!!, temp)
-                    openDoc( temp)
-                }
+        Log.w("check", "creating dialogBox")
+        val builder = MaterialAlertDialogBuilder(requireContext())
+            .setView(dialogLayout)
+            .setNeutralButton("Cancel") { _, which ->
             }
-            setNegativeButton("Cancel") { dialog, which ->
-                Log.d("PKS", "-ve Button Clicked")
-
+            .setPositiveButton("Create") { _, which ->
             }
-            setView(dialogLayout)
-            show()
+        val dialog = builder.show()
+        dialog.getButton(-1).setOnClickListener {
+           temp = editText.text.toString()
+            if (temp.isEmpty()) {
+                Toast.makeText(requireContext(), "Enter Pdf Name!", Toast.LENGTH_LONG).show()
 
+            } else {
+                dialog.dismiss()
+                progressBarDialog()
+                isDialogBoxShowing = false
+            }
         }
+        dialog.getButton(-2).setOnClickListener {
+
+            dialog.dismiss()
+            isDialogBoxShowing = false
+        }
+
+
+
+    }
+    var isprogressBarDialogShowing=false
+    private fun progressBarDialog() {
+      mProgressDialog = ProgressDialog(requireContext(),R.style.AppCompatDialogBox)
+        mProgressDialog.setTitle("Please wait...")
+        mProgressDialog.setMessage("Preparing")
+        isprogressBarDialogShowing=true
+        mProgressDialog.show()
+        createPdf(viewModel.listOfBitmaps.value!!, temp)
+        mProgressDialog.dismiss()
+
     }
 
-    private fun openDoc(pdfFileName: String) {
-           val documentsDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
-        val directoryName = "pdfGeneratorDocuments"
-        val directory=File(documentsDirectory, directoryName)
-        if (!directory.exists()) {directory.mkdirs()}
-//
-        val pdfFilePath = "${directory.path}/$pdfFileName.pdf"
-        val pdfFile = File(pdfFilePath)
+    private fun openDoc(pdfFile: File) {
+
         val authority = "com.example.pdf_generator.fileprovider"
 
         val pdfUri = FileProvider.getUriForFile(requireContext(), authority, pdfFile)
@@ -181,7 +201,13 @@ class ImagePreviewFragment : Fragment(), ItemClickListner {
             pdfDocument.writeTo(FileOutputStream(pdfFile))
             pdfDocument.close()
             Toast.makeText(requireContext(), "${pdfFileName}.pdf saved successfully", Toast.LENGTH_SHORT).show()
+            openDoc(pdfFile)
+            if(isprogressBarDialogShowing){
+                mProgressDialog.dismiss()
+                isprogressBarDialogShowing=false
+            }
             viewModel.clearList()
+
         } catch (e: IOException) {
             Log.w(ContentValues.TAG, "Error while creating Pdf: ${e}")
             Toast.makeText(requireContext(), "Failed to create PDF", Toast.LENGTH_SHORT).show()

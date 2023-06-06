@@ -75,7 +75,12 @@ class CameraFragment : Fragment()
         super.onViewCreated(view, savedInstanceState)
         if (checkallPermission()) startCamera()
         else requestPermission()
-        binding.captureBtn.setOnClickListener{ captureImage() }
+        var captureBtnClicked =false
+        binding.captureBtn.setOnClickListener{
+            if(!captureBtnClicked){ binding.pbImgPt.visibility = View.VISIBLE }
+            captureBtnClicked=true
+            captureImage()
+        }
 
         binding.homeBtn.setOnClickListener {
             val action=CameraFragmentDirections.actionCameraFragmentToHomeFragment()
@@ -196,6 +201,7 @@ class CameraFragment : Fragment()
                     capturedBitmap?.let { it->
                         binding.clickedImageIv.visibility=View.VISIBLE
                         binding.clickedImageIv.setImageBitmap(it)
+                        binding.pbImgPt.visibility=View.INVISIBLE
                         binding.saveBtn.isVisible=true
                         viewModel.addElementToList(it)
                     }

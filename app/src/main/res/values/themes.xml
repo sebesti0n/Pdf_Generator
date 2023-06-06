@@ -18,5 +18,8 @@
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
+    <style name="AppCompatDialogBox" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorAccent">@color/blueDark</item>
+    </style>
 
 </resources>
